@@ -1,0 +1,101 @@
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import LoginPage from './pages/LoginPage';
+import StudentDashboard from './pages/StudentDashboard';
+import EmployerDashboard from './pages/EmployerDashboard';
+import PlacementOfficerDashboard from './pages/PlacementOfficerDashboard';
+import AdminDashboard from './pages/AdminDashboard';
+import MyApplications from './pages/MyApplications';
+import SavedJobs from './pages/SavedJobs';
+import Interviews from './pages/Interviews';
+import Profile from './pages/Profile';
+import './index.css';
+
+// Protected Route Component
+const ProtectedRoute = ({ children, allowedRoles }) => {
+  const userRole = sessionStorage.getItem('userRole');
+  
+  if (!userRole) {
+    return <Navigate to="/" replace />;
+  }
+  
+  if (allowedRoles && !allowedRoles.includes(userRole)) {
+    return <Navigate to="/" replace />;
+  }
+  
+  return children;
+};
+
+// Role-based Dashboard Router
+const RoleBasedDashboard = () => {
+  const userRole = sessionStorage.getItem('userRole');
+  
+  switch(userRole) {
+    case 'Student':
+      return <StudentDashboard />;
+    case 'Employer':
+      return <EmployerDashboard />;
+    case 'Placement Officer':
+      return <PlacementOfficerDashboard />;
+    case 'Admin':
+      return <AdminDashboard />;
+    default:
+      return <Navigate to="/" replace />;
+  }
+};
+
+function App() {
+  return (
+    <Router>
+      <div className="app-container" style={{ minHeight: '100vh' }}>
+        <Routes>
+          <Route path="/" element={<LoginPage />} />
+          <Route 
+            path="/dashboard" 
+            element={
+              <ProtectedRoute>
+                <RoleBasedDashboard />
+              </ProtectedRoute>
+            } 
+          />
+          {/* Student Routes */}
+          <Route 
+            path="/applications" 
+            element={
+              <ProtectedRoute allowedRoles={['Student']}>
+                <MyApplications />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/saved-jobs" 
+            element={
+              <ProtectedRoute allowedRoles={['Student']}>
+                <SavedJobs />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/interviews" 
+            element={
+              <ProtectedRoute allowedRoles={['Student']}>
+                <Interviews />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/profile" 
+            element={
+              <ProtectedRoute allowedRoles={['Student']}>
+                <Profile />
+              </ProtectedRoute>
+            } 
+          />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </div>
+    </Router>
+  );
+}
+
+export default App;
