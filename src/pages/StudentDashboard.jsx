@@ -3,14 +3,16 @@ import { useNavigate } from 'react-router-dom';
 import {
     LogOut, LayoutDashboard, Search, Bell, User, Briefcase,
     MapPin, Clock, DollarSign, Building2, TrendingUp, FileText,
-    Calendar, BookmarkPlus, ExternalLink, Filter
+    Calendar, BookmarkPlus, ExternalLink, Filter, Sun, Moon
 } from 'lucide-react';
+import { useTheme } from '../contexts/ThemeContext';
 
 const StudentDashboard = () => {
     const email = sessionStorage.getItem('userEmail') || 'student@demo.com';
     const navigate = useNavigate();
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedFilter, setSelectedFilter] = useState('all');
+    const { theme, toggleTheme } = useTheme();
 
     const handleLogout = () => {
         sessionStorage.clear();
@@ -161,6 +163,14 @@ const StudentDashboard = () => {
                         <p style={{ color: 'var(--text-gray)' }}>Find your dream job today</p>
                     </div>
                     <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
+                        <div 
+                            className="glass-card" 
+                            style={{ padding: '0.6rem', borderRadius: '50%', cursor: 'pointer' }}
+                            onClick={toggleTheme}
+                            title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+                        >
+                            {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+                        </div>
                         <div className="glass-card" style={{ padding: '0.6rem', borderRadius: '50%', cursor: 'pointer' }}>
                             <Bell size={20} />
                         </div>

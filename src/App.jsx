@@ -1,6 +1,8 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
+import SignupPage from './pages/SignupPage';
 import StudentDashboard from './pages/StudentDashboard';
 import EmployerDashboard from './pages/EmployerDashboard';
 import PlacementOfficerDashboard from './pages/PlacementOfficerDashboard';
@@ -16,11 +18,11 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
   const userRole = sessionStorage.getItem('userRole');
   
   if (!userRole) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/login" replace />;
   }
   
   if (allowedRoles && !allowedRoles.includes(userRole)) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/login" replace />;
   }
   
   return children;
@@ -40,7 +42,7 @@ const RoleBasedDashboard = () => {
     case 'Admin':
       return <AdminDashboard />;
     default:
-      return <Navigate to="/" replace />;
+      return <Navigate to="/login" replace />;
   }
 };
 
@@ -49,7 +51,9 @@ function App() {
     <Router>
       <div className="app-container" style={{ minHeight: '100vh' }}>
         <Routes>
-          <Route path="/" element={<LoginPage />} />
+          <Route path="/" element={<HomePage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/signup" element={<SignupPage />} />
           <Route 
             path="/dashboard" 
             element={
@@ -91,7 +95,7 @@ function App() {
               </ProtectedRoute>
             } 
           />
-          <Route path="*" element={<Navigate to="/" replace />} />
+          <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
       </div>
     </Router>
