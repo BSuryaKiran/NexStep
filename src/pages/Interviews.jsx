@@ -1,78 +1,40 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     LogOut, User, Bell, Briefcase, FileText, BookmarkPlus, Calendar,
-    MapPin, Clock, Building2, Video, Phone, Users, CheckCircle
+    MapPin, Clock, Building2, Video, Phone, Users, CheckCircle, Sun, Moon
 } from 'lucide-react';
+import { useTheme } from '../contexts/ThemeContext';
 
 const Interviews = () => {
     const email = sessionStorage.getItem('userEmail') || 'student@demo.com';
+    const userId = sessionStorage.getItem('userId') || email;
     const navigate = useNavigate();
+    const [interviews, setInterviews] = useState([]);
+    const { theme, toggleTheme } = useTheme();
 
     const handleLogout = () => {
         sessionStorage.clear();
         navigate('/');
     };
 
-    const upcomingInterviews = [
-        {
-            id: 1,
-            title: 'Frontend Developer',
-            company: 'Microsoft',
-            date: '2026-02-25',
-            time: '10:00 AM',
-            type: 'Video Call',
-            interviewer: 'Sarah Johnson',
-            round: 'Technical Round 1',
-            logo: '🪟',
-            meetingLink: 'https://teams.microsoft.com/meet'
-        },
-        {
-            id: 2,
-            title: 'Software Engineer',
-            company: 'Google',
-            date: '2026-02-28',
-            time: '2:00 PM',
-            type: 'On-site',
-            interviewer: 'Rahul Mehta',
-            round: 'HR Round',
-            logo: '🔍',
-            location: 'Google Office, Bangalore'
-        },
-        {
-            id: 3,
-            title: 'Data Scientist',
-            company: 'Meta',
-            date: '2026-03-02',
-            time: '11:30 AM',
-            type: 'Phone Call',
-            interviewer: 'Emily Chen',
-            round: 'Technical Round 2',
-            logo: '👥',
-            phone: '+91-XXX-XXX-XXXX'
-        }
-    ];
+    useEffect(() => {
+        loadInterviews();
+        window.addEventListener('storage', loadInterviews);
+        return () => window.removeEventListener('storage', loadInterviews);
+    }, []);
 
-    const pastInterviews = [
-        {
-            id: 4,
-            title: 'Full Stack Developer',
-            company: 'Flipkart',
-            date: '2026-02-10',
-            result: 'Selected',
-            round: 'Final Round',
-            logo: '🛒'
-        },
-        {
-            id: 5,
-            title: 'Backend Engineer',
-            company: 'Amazon',
-            date: '2026-02-05',
-            result: 'Rejected',
-            round: 'Technical Round 1',
-            logo: '📦'
-        }
-    ];
+    const loadInterviews = () => {
+        const allApplications = JSON.parse(localStorage.getItem('applications') || '[]');
+        const myInterviews = allApplications.filter(app => 
+            app.studentId === userId && app.status === 'Interview Scheduled'
+        );
+        setInterviews(myInterviews);
+    };
+
+    const upcomingInterviews = interviews;
+
+    const pastInterviews = [];
 
     return (
         <div style={{ display: 'flex', height: '100vh', background: 'var(--bg)' }}>
@@ -124,6 +86,20 @@ const Interviews = () => {
                         <p style={{ color: 'var(--text-gray)' }}>Manage your interview schedule</p>
                     </div>
                     <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
+                        <button 
+                            onClick={toggleTheme}
+                            className="glass-card"
+                            style={{ 
+                                padding: '0.6rem', 
+                                borderRadius: '50%', 
+                                cursor: 'pointer',
+                                background: 'transparent',
+                                border: '1px solid var(--glass-border)'
+                            }}
+                            title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+                        >
+                            {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+                        </button>
                         <div className="glass-card" style={{ padding: '0.6rem', borderRadius: '50%', cursor: 'pointer' }}>
                             <Bell size={20} />
                         </div>
@@ -159,7 +135,7 @@ const Interviews = () => {
                                     <div style={{ flex: 1 }}>
                                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '0.8rem' }}>
                                             <div>
-                                                <h3 style={{ fontSize: '1.3rem', marginBottom: '0.3rem' }}>{interview.title}</h3>
+                                                <h3 style={{ fontSize: '1.3rem', marginBottom: '0.3rem' }}>{interview.jobTitle}</h3>
                                                 <p style={{ fontSize: '1.05rem', color: 'var(--text-gray)' }}>{interview.company}</p>
                                             </div>
                                             <span className="glass-card" style={{ 
@@ -168,44 +144,48 @@ const Interviews = () => {
                                                 background: 'rgba(99, 102, 241, 0.1)',
                                                 color: 'var(--primary)'
                                             }}>
-                                                {interview.round}
+                                                {interview.status}
                                             </span>
                                         </div>
                                         
                                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+                                            {interview.examDate && (
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-gray)' }}>
+                                                    <Calendar size={16} />
+                                                    <span style={{ fontSize: '0.95rem' }}>Exam: {new Date(interview.examDate).toLocaleDateString()}</span>
+                                                </div>
+                                            )}
                                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-gray)' }}>
-                                                <Calendar size={16} />
-                                                <span style={{ fontSize: '0.95rem' }}>{interview.date}</span>
+                                                <MapPin size={16} />
+                                                <span style={{ fontSize: '0.95rem' }}>{interview.location}</span>
                                             </div>
+                                            {interview.mode && (
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-gray)' }}>
+                                                    {interview.mode === 'Online' && <Video size={16} />}
+                                                    {interview.mode === 'Offline' && <MapPin size={16} />}
+                                                    {interview.mode === 'Hybrid' && <Building2 size={16} />}
+                                                    <span style={{ fontSize: '0.95rem' }}>Mode: {interview.mode}</span>
+                                                </div>
+                                            )}
                                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-gray)' }}>
                                                 <Clock size={16} />
-                                                <span style={{ fontSize: '0.95rem' }}>{interview.time}</span>
-                                            </div>
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-gray)' }}>
-                                                {interview.type === 'Video Call' && <Video size={16} />}
-                                                {interview.type === 'Phone Call' && <Phone size={16} />}
-                                                {interview.type === 'On-site' && <MapPin size={16} />}
-                                                <span style={{ fontSize: '0.95rem' }}>{interview.type}</span>
-                                            </div>
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-gray)' }}>
-                                                <Users size={16} />
-                                                <span style={{ fontSize: '0.95rem' }}>{interview.interviewer}</span>
+                                                <span style={{ fontSize: '0.95rem' }}>Applied: {new Date(interview.appliedDate).toLocaleDateString()}</span>
                                             </div>
                                         </div>
 
-                                        {interview.meetingLink && (
+                                        {interview.interviewDetails && (
                                             <div className="glass-card" style={{ 
                                                 padding: '0.8rem 1rem', 
-                                                background: 'rgba(16, 185, 129, 0.05)',
-                                                display: 'inline-flex',
-                                                alignItems: 'center',
-                                                gap: '0.5rem',
+                                                background: 'rgba(59, 130, 246, 0.1)',
                                                 marginBottom: '1rem'
                                             }}>
-                                                <Video size={16} style={{ color: '#10b981' }} />
-                                                <a href={interview.meetingLink} style={{ color: '#10b981', fontSize: '0.9rem', textDecoration: 'none' }}>
-                                                    Join Meeting
-                                                </a>
+                                                <div style={{ display: 'flex', alignItems: 'start', gap: '0.5rem' }}>
+                                                    <Users size={16} style={{ color: '#3b82f6', marginTop: '2px' }} />
+                                                    <div style={{ flex: 1 }}>
+                                                        <span style={{ color: '#3b82f6', fontSize: '0.85rem', fontWeight: 600, display: 'block', marginBottom: '0.3rem' }}>Interview Details:</span>
+                                                        <span style={{ color: '#3b82f6', fontSize: '0.9rem' }}>{interview.interviewDetails}</span>
+                                                    </div>
+                                                </div>
                                             </div>
                                         )}
 

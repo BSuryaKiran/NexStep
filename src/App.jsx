@@ -35,7 +35,7 @@ const RoleBasedDashboard = () => {
   switch(userRole) {
     case 'Student':
       return <StudentDashboard />;
-    case 'Employer':
+    case 'Recruiter':
       return <EmployerDashboard />;
     case 'Placement Officer':
       return <PlacementOfficerDashboard />;

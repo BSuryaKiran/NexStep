@@ -1,20 +1,28 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     LogOut, User, Bell, Briefcase, Users, BarChart3,
     Plus, Edit, Trash2, Eye, MapPin, DollarSign, Calendar,
-    TrendingUp, Building2, CheckCircle
+    TrendingUp, Building2, CheckCircle, Sun, Moon, X, Check
 } from 'lucide-react';
+import { useTheme } from '../contexts/ThemeContext';
 
 const EmployerDashboard = () => {
-    const email = sessionStorage.getItem('userEmail') || 'employer@demo.com';
+    const email = sessionStorage.getItem('userEmail') || 'recruiter@demo.com';
+    const userId = sessionStorage.getItem('userId');
+    const companyName = sessionStorage.getItem('userCompany') || email.split('@')[0];
     const navigate = useNavigate();
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [activeTab, setActiveTab] = useState('jobs');
+    const [showSuccess, setShowSuccess] = useState(false);
+    const [successMessage, setSuccessMessage] = useState('');
+    const [selectedApplication, setSelectedApplication] = useState(null);
+    const { theme, toggleTheme } = useTheme();
 
     const [newJob, setNewJob] = useState({
         title: '', location: '', type: 'Full-time',
-        salary: '', description: '', skills: '', deadline: ''
+        salary: '', description: '', skills: '', deadline: '',
+        examDate: '', interviewDetails: '', mode: 'Online'
     });
 
     const handleLogout = () => {
@@ -22,24 +30,42 @@ const EmployerDashboard = () => {
         navigate('/');
     };
 
-    const [postedJobs, setPostedJobs] = useState([
-        { id: 1, title: 'Senior Frontend Developer', location: 'Bangalore, India', type: 'Full-time', salary: '₹15-20 LPA', posted: '2 days ago', applications: 45, status: 'Active', deadline: '2026-03-15' },
-        { id: 2, title: 'Product Manager', location: 'Mumbai, India', type: 'Full-time', salary: '₹20-25 LPA', posted: '1 week ago', applications: 78, status: 'Active', deadline: '2026-03-20' },
-        { id: 3, title: 'Data Science Intern', location: 'Remote', type: 'Internship', salary: '₹40k/month', posted: '5 days ago', applications: 123, status: 'Active', deadline: '2026-03-10' }
-    ]);
+    // Load jobs from localStorage
+    const [postedJobs, setPostedJobs] = useState([]);
+    const [applications, setApplications] = useState([]);
+
+    useEffect(() => {
+        loadJobs();
+        loadApplications();
+        // Listen for storage changes
+        window.addEventListener('storage', () => {
+            loadJobs();
+            loadApplications();
+        });
+        return () => window.removeEventListener('storage', () => {
+            loadJobs();
+            loadApplications();
+        });
+    }, []);
+
+    const loadJobs = () => {
+        const jobs = JSON.parse(localStorage.getItem('jobs') || '[]');
+        const myJobs = jobs.filter(job => job.recruiterId === userId);
+        setPostedJobs(myJobs);
+    };
+
+    const loadApplications = () => {
+        const allApplications = JSON.parse(localStorage.getItem('applications') || '[]');
+        const jobs = JSON.parse(localStorage.getItem('jobs') || '[]');
+        const myJobIds = jobs.filter(job => job.recruiterId === userId).map(job => job.id);
+        const myApplications = allApplications.filter(app => myJobIds.includes(app.jobId));
+        setApplications(myApplications);
+    };
 
     const stats = [
-        { label: 'Total Applications', value: '246', icon: Users, color: '#6366f1' },
-        { label: 'Active Jobs', value: '3', icon: Briefcase, color: '#10b981' },
-        { label: 'Hired This Month', value: '8', icon: TrendingUp, color: '#f59e0b' }
-    ];
-
-    const applications = [
-        { id: 1, name: 'Rahul Sharma', role: 'Senior Frontend Developer', college: 'IIT Bombay', cgpa: '8.9', appliedDate: '2026-02-16', status: 'Under Review' },
-        { id: 2, name: 'Priya Patel', role: 'Senior Frontend Developer', college: 'NIT Trichy', cgpa: '9.1', appliedDate: '2026-02-15', status: 'Shortlisted' },
-        { id: 3, name: 'Amit Kumar', role: 'Product Manager', college: 'IIM Ahmedabad', cgpa: '8.5', appliedDate: '2026-02-14', status: 'Interview Scheduled' },
-        { id: 4, name: 'Sneha Reddy', role: 'Data Science Intern', college: 'BITS Pilani', cgpa: '8.7', appliedDate: '2026-02-13', status: 'Offer Sent' },
-        { id: 5, name: 'Ravi Singh', role: 'Product Manager', college: 'VIT Vellore', cgpa: '7.8', appliedDate: '2026-02-12', status: 'Rejected' },
+        { label: 'Total Applications', value: applications.length.toString(), icon: Users, color: '#6366f1' },
+        { label: 'Active Jobs', value: postedJobs.length.toString(), icon: Briefcase, color: '#10b981' },
+        { label: 'Hired This Month', value: applications.filter(a => a.status === 'Offer Sent').length.toString(), icon: TrendingUp, color: '#f59e0b' }
     ];
 
     const statusColor = (status) => {
@@ -51,16 +77,72 @@ const EmployerDashboard = () => {
 
     const handleCreateJob = (e) => {
         e.preventDefault();
+        const companyName = sessionStorage.getItem('userCompany') || email.split('@')[0];
         const job = {
-            id: postedJobs.length + 1,
-            title: newJob.title, location: newJob.location,
-            type: newJob.type, salary: newJob.salary,
-            posted: 'Just now', applications: 0,
-            status: 'Active', deadline: newJob.deadline
+            id: Date.now().toString(),
+            title: newJob.title,
+            location: newJob.location,
+            type: newJob.type,
+            salary: newJob.salary,
+            description: newJob.description,
+            skills: newJob.skills.split(',').map(s => s.trim()).filter(s => s),
+            posted: 'Just now',
+            postedDate: new Date().toISOString(),
+            applications: 0,
+            status: 'Active',
+            deadline: newJob.deadline,
+            examDate: newJob.examDate,
+            interviewDetails: newJob.interviewDetails,
+            mode: newJob.mode,
+            company: companyName,
+            logo: '🏢',
+            recruiterId: userId,
+            recruiterEmail: email
         };
-        setPostedJobs([job, ...postedJobs]);
+        
+        // Save to localStorage
+        const jobs = JSON.parse(localStorage.getItem('jobs') || '[]');
+        jobs.unshift(job);
+        localStorage.setItem('jobs', JSON.stringify(jobs));
+        
+        // Reload jobs
+        loadJobs();
+        
         setShowCreateModal(false);
-        setNewJob({ title: '', location: '', type: 'Full-time', salary: '', description: '', skills: '', deadline: '' });
+        setNewJob({ 
+            title: '', location: '', type: 'Full-time', 
+            salary: '', description: '', skills: '', deadline: '',
+            examDate: '', interviewDetails: '', mode: 'Online'
+        });
+        
+        // Show success message
+        setSuccessMessage('Job successfully posted!');
+        setShowSuccess(true);
+        setTimeout(() => setShowSuccess(false), 3000);
+    };
+
+    const handleDeleteJob = (jobId) => {
+        const jobs = JSON.parse(localStorage.getItem('jobs') || '[]');
+        const updatedJobs = jobs.filter(job => job.id !== jobId);
+        localStorage.setItem('jobs', JSON.stringify(updatedJobs));
+        loadJobs();
+    };
+
+    const handleUpdateApplicationStatus = (applicationId, newStatus) => {
+        const allApplications = JSON.parse(localStorage.getItem('applications') || '[]');
+        const updatedApplications = allApplications.map(app => {
+            if (app.id === applicationId) {
+                return { ...app, status: newStatus, statusColor: newStatus === 'Interview Scheduled' ? '#3b82f6' : newStatus === 'Rejected' ? '#ef4444' : app.statusColor };
+            }
+            return app;
+        });
+        localStorage.setItem('applications', JSON.stringify(updatedApplications));
+        loadApplications();
+        
+        // Show success message
+        setSuccessMessage(`Application ${newStatus.toLowerCase()}!`);
+        setShowSuccess(true);
+        setTimeout(() => setShowSuccess(false), 3000);
     };
 
     const navItems = [
@@ -72,6 +154,28 @@ const EmployerDashboard = () => {
 
     return (
         <div style={{ display: 'flex', height: '100vh', background: 'var(--bg)' }}>
+
+            {/* Success Notification */}
+            {showSuccess && (
+                <div style={{
+                    position: 'fixed',
+                    top: '2rem',
+                    right: '2rem',
+                    zIndex: 1000,
+                    background: 'linear-gradient(135deg, #10b981, #059669)',
+                    color: 'white',
+                    padding: '1rem 2rem',
+                    borderRadius: '12px',
+                    boxShadow: '0 8px 24px rgba(16, 185, 129, 0.3)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '1rem',
+                    animation: 'slideInRight 0.3s ease'
+                }}>
+                    <CheckCircle size={24} />
+                    <span style={{ fontWeight: 600, fontSize: '1rem' }}>{successMessage}</span>
+                </div>
+            )}
 
             {/* Sidebar */}
             <div className="glass" style={{ width: '280px', margin: '1rem', borderRight: '1px solid var(--glass-border)', display: 'flex', flexDirection: 'column', padding: '2rem' }}>
@@ -111,6 +215,20 @@ const EmployerDashboard = () => {
                         <p style={{ color: 'var(--text-gray)' }}>Manage your job postings and find top talent</p>
                     </div>
                     <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
+                        <button 
+                            onClick={toggleTheme}
+                            className="glass-card"
+                            style={{ 
+                                padding: '0.6rem', 
+                                borderRadius: '50%', 
+                                cursor: 'pointer',
+                                background: 'transparent',
+                                border: '1px solid var(--glass-border)'
+                            }}
+                            title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+                        >
+                            {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+                        </button>
                         <div className="glass-card" style={{ padding: '0.6rem', borderRadius: '50%', cursor: 'pointer' }}>
                             <Bell size={20} />
                         </div>
@@ -118,7 +236,7 @@ const EmployerDashboard = () => {
                             <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                 <User size={18} />
                             </div>
-                            <span style={{ fontSize: '0.9rem' }}>Employer</span>
+                            <span style={{ fontSize: '0.9rem' }}>Recruiter</span>
                         </div>
                     </div>
                 </div>
@@ -170,7 +288,13 @@ const EmployerDashboard = () => {
                                         <div style={{ display: 'flex', gap: '0.8rem', marginLeft: '2rem' }}>
                                             <button className="btn btn-outline" style={{ padding: '0.6rem', borderRadius: '8px' }} onClick={() => setActiveTab('applications')}><Eye size={18} /></button>
                                             <button className="btn btn-outline" style={{ padding: '0.6rem', borderRadius: '8px' }}><Edit size={18} /></button>
-                                            <button className="btn btn-outline" style={{ padding: '0.6rem', borderRadius: '8px', color: '#ef4444', borderColor: '#ef4444' }}><Trash2 size={18} /></button>
+                                            <button 
+                                                className="btn btn-outline" 
+                                                style={{ padding: '0.6rem', borderRadius: '8px', color: '#ef4444', borderColor: '#ef4444' }}
+                                                onClick={() => handleDeleteJob(job.id)}
+                                            >
+                                                <Trash2 size={18} />
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -182,27 +306,68 @@ const EmployerDashboard = () => {
                 {activeTab === 'applications' && (
                     <div className="glass" style={{ padding: '2rem' }}>
                         <h2 style={{ fontSize: '1.3rem', marginBottom: '1.5rem' }}>Applications Overview</h2>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                            {applications.map(app => {
-                                const sc = statusColor(app.status);
-                                return (
-                                    <div key={app.id} className="glass-card" style={{ padding: '1.2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                            <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600 }}>{app.name.charAt(0)}</div>
-                                            <div>
-                                                <h4 style={{ fontSize: '1.1rem' }}>{app.name}</h4>
-                                                <p style={{ fontSize: '0.85rem', color: 'var(--text-gray)' }}>Applied for {app.role}</p>
-                                                <p style={{ fontSize: '0.8rem', color: 'var(--text-gray)' }}>{app.college} · CGPA: {app.cgpa}</p>
+                        {applications.length === 0 ? (
+                            <div style={{ textAlign: 'center', padding: '4rem 2rem' }}>
+                                <Users size={48} style={{ color: 'var(--text-gray)', marginBottom: '1rem' }} />
+                                <h3 style={{ fontSize: '1.2rem', marginBottom: '0.5rem', color: 'var(--text-gray)' }}>No Applications Yet</h3>
+                                <p style={{ color: 'var(--text-gray)', fontSize: '0.95rem' }}>Applications will appear here once students apply to your jobs.</p>
+                            </div>
+                        ) : (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                                {applications.map(app => {
+                                    const sc = statusColor(app.status);
+                                    return (
+                                        <div key={app.id} className="glass-card" style={{ padding: '1.5rem' }}>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', flex: 1 }}>
+                                                    <div style={{ width: '50px', height: '50px', borderRadius: '50%', background: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600, fontSize: '1.2rem' }}>
+                                                        {app.studentName ? app.studentName.charAt(0).toUpperCase() : 'S'}
+                                                    </div>
+                                                    <div style={{ flex: 1 }}>
+                                                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '0.5rem' }}>
+                                                            <h4 style={{ fontSize: '1.1rem' }}>{app.studentName || 'Student'}</h4>
+                                                            <span className="glass-card" style={{ padding: '0.3rem 0.8rem', fontSize: '0.8rem', background: sc.bg, color: sc.color }}>{app.status}</span>
+                                                        </div>
+                                                        <p style={{ fontSize: '0.9rem', color: 'var(--text-gray)', marginBottom: '0.3rem' }}>Applied for: {app.jobTitle}</p>
+                                                        <p style={{ fontSize: '0.85rem', color: 'var(--text-gray)' }}>Email: {app.studentEmail} · Applied: {new Date(app.appliedDate).toLocaleDateString()}</p>
+                                                    </div>
+                                                </div>
+                                                <div style={{ display: 'flex', gap: '0.8rem' }}>
+                                                    <button 
+                                                        className="btn btn-outline" 
+                                                        style={{ padding: '0.6rem 1rem', fontSize: '0.85rem' }}
+                                                        onClick={() => setSelectedApplication(app)}
+                                                        title="View Profile"
+                                                    >
+                                                        <Eye size={16} /> View
+                                                    </button>
+                                                    {app.status === 'Under Review' && (
+                                                        <>
+                                                            <button 
+                                                                className="btn" 
+                                                                style={{ padding: '0.6rem 1rem', fontSize: '0.85rem', background: '#10b981', color: 'white' }}
+                                                                onClick={() => handleUpdateApplicationStatus(app.id, 'Interview Scheduled')}
+                                                                title="Accept Application"
+                                                            >
+                                                                <Check size={16} /> Accept
+                                                            </button>
+                                                            <button 
+                                                                className="btn" 
+                                                                style={{ padding: '0.6rem 1rem', fontSize: '0.85rem', background: '#ef4444', color: 'white' }}
+                                                                onClick={() => handleUpdateApplicationStatus(app.id, 'Rejected')}
+                                                                title="Reject Application"
+                                                            >
+                                                                <X size={16} /> Reject
+                                                            </button>
+                                                        </>
+                                                    )}
+                                                </div>
                                             </div>
                                         </div>
-                                        <div style={{ textAlign: 'right' }}>
-                                            <span className="glass-card" style={{ padding: '0.3rem 0.8rem', fontSize: '0.8rem', background: sc.bg, color: sc.color }}>{app.status}</span>
-                                            <p style={{ fontSize: '0.8rem', color: 'var(--text-gray)', marginTop: '0.3rem' }}>{app.appliedDate}</p>
-                                        </div>
-                                    </div>
-                                );
-                            })}
-                        </div>
+                                    );
+                                })}
+                            </div>
+                        )}
                     </div>
                 )}
 
@@ -268,7 +433,7 @@ const EmployerDashboard = () => {
                         <div style={{ display: 'grid', gap: '1.5rem', maxWidth: '600px' }}>
                             <div className="form-group">
                                 <label className="form-label">Company Name</label>
-                                <input className="form-input" defaultValue="Tech Solutions Ltd" />
+                                <input className="form-input" defaultValue={companyName} />
                             </div>
                             <div className="form-group">
                                 <label className="form-label">Industry</label>
@@ -342,6 +507,29 @@ const EmployerDashboard = () => {
                                 <input type="date" value={newJob.deadline} onChange={(e) => setNewJob({ ...newJob, deadline: e.target.value })} className="form-input" required />
                             </div>
                             <div className="form-group">
+                                <label className="form-label">Exam Date</label>
+                                <input type="date" value={newJob.examDate} onChange={(e) => setNewJob({ ...newJob, examDate: e.target.value })} className="form-input" />
+                            </div>
+                            <div className="form-group">
+                                <label className="form-label">Interview Mode *</label>
+                                <select value={newJob.mode} onChange={(e) => setNewJob({ ...newJob, mode: e.target.value })} className="form-input" required>
+                                    <option value="Online">Online</option>
+                                    <option value="Offline">Offline</option>
+                                    <option value="Hybrid">Hybrid</option>
+                                </select>
+                            </div>
+                            <div className="form-group">
+                                <label className="form-label">Interview Details (Rounds, Process, etc.)</label>
+                                <textarea 
+                                    value={newJob.interviewDetails} 
+                                    onChange={(e) => setNewJob({ ...newJob, interviewDetails: e.target.value })} 
+                                    className="form-input" 
+                                    placeholder="Round 1: Technical Test&#10;Round 2: HR Interview&#10;Round 3: Final Interview" 
+                                    rows="4"
+                                    style={{ resize: 'vertical' }}
+                                />
+                            </div>
+                            <div className="form-group">
                                 <label className="form-label">Required Skills</label>
                                 <input type="text" value={newJob.skills} onChange={(e) => setNewJob({ ...newJob, skills: e.target.value })} className="form-input" placeholder="e.g., React, Node.js, Python (comma-separated)" />
                             </div>
@@ -358,6 +546,87 @@ const EmployerDashboard = () => {
                                 </button>
                             </div>
                         </form>
+                    </div>
+                </div>
+            )}
+
+            {/* Student Profile Modal */}
+            {selectedApplication && (
+                <div style={{
+                    position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    zIndex: 1000, padding: '2rem'
+                }} onClick={() => setSelectedApplication(null)}>
+                    <div className="glass" style={{ maxWidth: '600px', width: '100%', maxHeight: '90vh', overflowY: 'auto', padding: '2rem' }} onClick={(e) => e.stopPropagation()}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '2rem' }}>
+                            <h2 style={{ fontSize: '1.5rem' }}>Student Profile</h2>
+                            <button 
+                                onClick={() => setSelectedApplication(null)} 
+                                className="glass-card" 
+                                style={{ padding: '0.5rem', cursor: 'pointer', background: 'transparent', border: '1px solid var(--glass-border)' }}
+                            >
+                                <X size={20} />
+                            </button>
+                        </div>
+                        
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+                                <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600, fontSize: '2rem' }}>
+                                    {selectedApplication.studentName ? selectedApplication.studentName.charAt(0).toUpperCase() : 'S'}
+                                </div>
+                                <div>
+                                    <h3 style={{ fontSize: '1.5rem', marginBottom: '0.3rem' }}>{selectedApplication.studentName || 'Student'}</h3>
+                                    <p style={{ color: 'var(--text-gray)', fontSize: '0.95rem' }}>{selectedApplication.studentEmail}</p>
+                                </div>
+                            </div>
+
+                            <div className="glass-card" style={{ padding: '1.5rem' }}>
+                                <h4 style={{ fontSize: '1.1rem', marginBottom: '1rem' }}>Application Details</h4>
+                                <div style={{ display: 'grid', gap: '0.8rem' }}>
+                                    <div><span style={{ color: 'var(--text-gray)', fontSize: '0.9rem' }}>Applied For:</span> <span style={{ fontWeight: 500 }}>{selectedApplication.jobTitle}</span></div>
+                                    <div><span style={{ color: 'var(--text-gray)', fontSize: '0.9rem' }}>Applied On:</span> <span style={{ fontWeight: 500 }}>{new Date(selectedApplication.appliedDate).toLocaleDateString()}</span></div>
+                                    <div><span style={{ color: 'var(--text-gray)', fontSize: '0.9rem' }}>Status:</span> <span style={{ fontWeight: 500 }}>{selectedApplication.status}</span></div>
+                                    {selectedApplication.examDate && (
+                                        <div><span style={{ color: 'var(--text-gray)', fontSize: '0.9rem' }}>Exam Date:</span> <span style={{ fontWeight: 500 }}>{new Date(selectedApplication.examDate).toLocaleDateString()}</span></div>
+                                    )}
+                                    {selectedApplication.mode && (
+                                        <div><span style={{ color: 'var(--text-gray)', fontSize: '0.9rem' }}>Interview Mode:</span> <span style={{ fontWeight: 500 }}>{selectedApplication.mode}</span></div>
+                                    )}
+                                </div>
+                            </div>
+
+                            {selectedApplication.interviewDetails && (
+                                <div className="glass-card" style={{ padding: '1.5rem' }}>
+                                    <h4 style={{ fontSize: '1.1rem', marginBottom: '0.8rem' }}>Interview Process</h4>
+                                    <p style={{ color: 'var(--text-gray)', fontSize: '0.95rem', lineHeight: 1.6, whiteSpace: 'pre-line' }}>{selectedApplication.interviewDetails}</p>
+                                </div>
+                            )}
+
+                            {selectedApplication.status === 'Under Review' && (
+                                <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+                                    <button 
+                                        className="btn" 
+                                        style={{ flex: 1, justifyContent: 'center', background: '#10b981', color: 'white' }}
+                                        onClick={() => {
+                                            handleUpdateApplicationStatus(selectedApplication.id, 'Interview Scheduled');
+                                            setSelectedApplication(null);
+                                        }}
+                                    >
+                                        <Check size={18} /> Accept Application
+                                    </button>
+                                    <button 
+                                        className="btn" 
+                                        style={{ flex: 1, justifyContent: 'center', background: '#ef4444', color: 'white' }}
+                                        onClick={() => {
+                                            handleUpdateApplicationStatus(selectedApplication.id, 'Rejected');
+                                            setSelectedApplication(null);
+                                        }}
+                                    >
+                                        <X size={18} /> Reject Application
+                                    </button>
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </div>
             )}

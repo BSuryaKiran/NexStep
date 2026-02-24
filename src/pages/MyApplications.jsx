@@ -1,73 +1,41 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     LogOut, User, Bell, Briefcase, FileText, BookmarkPlus, Calendar,
-    MapPin, Clock, Building2, Eye, Trash2, CheckCircle, XCircle, AlertCircle
+    MapPin, Clock, Building2, Eye, Trash2, CheckCircle, XCircle, AlertCircle, Sun, Moon
 } from 'lucide-react';
+import { useTheme } from '../contexts/ThemeContext';
 
 const MyApplications = () => {
     const email = sessionStorage.getItem('userEmail') || 'student@demo.com';
+    const userId = sessionStorage.getItem('userId');
     const navigate = useNavigate();
     const [filter, setFilter] = useState('all');
+    const [applications, setApplications] = useState([]);
+    const { theme, toggleTheme } = useTheme();
 
     const handleLogout = () => {
         sessionStorage.clear();
         navigate('/');
     };
 
-    const applications = [
-        {
-            id: 1,
-            title: 'Software Engineer',
-            company: 'Google',
-            location: 'Bangalore, India',
-            appliedDate: '2026-02-15',
-            status: 'Under Review',
-            statusColor: '#f59e0b',
-            salary: '₹15-20 LPA',
-            logo: '🔍'
-        },
-        {
-            id: 2,
-            title: 'Frontend Developer',
-            company: 'Microsoft',
-            location: 'Hyderabad, India',
-            appliedDate: '2026-02-12',
-            status: 'Interview Scheduled',
-            statusColor: '#3b82f6',
-            salary: '₹12-18 LPA',
-            logo: '🪟',
-            interviewDate: '2026-02-25'
-        },
-        {
-            id: 3,
-            title: 'Data Analyst Intern',
-            company: 'Amazon',
-            location: 'Mumbai, India',
-            appliedDate: '2026-02-10',
-            status: 'Rejected',
-            statusColor: '#ef4444',
-            salary: '₹50k/month',
-            logo: '📦'
-        },
-        {
-            id: 4,
-            title: 'Full Stack Developer',
-            company: 'Flipkart',
-            location: 'Bangalore, India',
-            appliedDate: '2026-02-08',
-            status: 'Offer Received',
-            statusColor: '#10b981',
-            salary: '₹10-15 LPA',
-            logo: '🛒'
-        }
-    ];
+    useEffect(() => {
+        loadApplications();
+        window.addEventListener('storage', loadApplications);
+        return () => window.removeEventListener('storage', loadApplications);
+    }, []);
+
+    const loadApplications = () => {
+        const allApplications = JSON.parse(localStorage.getItem('applications') || '[]');
+        const myApps = allApplications.filter(app => app.studentId === userId);
+        setApplications(myApps);
+    };
 
     const stats = [
-        { label: 'Total Applications', value: '12', color: '#6366f1' },
-        { label: 'Under Review', value: '5', color: '#f59e0b' },
-        { label: 'Interviews', value: '3', color: '#3b82f6' },
-        { label: 'Offers', value: '1', color: '#10b981' }
+        { label: 'Total Applications', value: applications.length.toString(), color: '#6366f1' },
+        { label: 'Under Review', value: applications.filter(a => a.status === 'Under Review').length.toString(), color: '#f59e0b' },
+        { label: 'Interviews', value: applications.filter(a => a.status === 'Interview Scheduled').length.toString(), color: '#3b82f6' },
+        { label: 'Offers', value: applications.filter(a => a.status === 'Offer Received').length.toString(), color: '#10b981' }
     ];
 
     const filteredApplications = applications.filter(app => {
@@ -128,6 +96,20 @@ const MyApplications = () => {
                         <p style={{ color: 'var(--text-gray)' }}>Track all your job applications</p>
                     </div>
                     <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
+                        <button 
+                            onClick={toggleTheme}
+                            className="glass-card"
+                            style={{ 
+                                padding: '0.6rem', 
+                                borderRadius: '50%', 
+                                cursor: 'pointer',
+                                background: 'transparent',
+                                border: '1px solid var(--glass-border)'
+                            }}
+                            title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+                        >
+                            {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+                        </button>
                         <div className="glass-card" style={{ padding: '0.6rem', borderRadius: '50%', cursor: 'pointer' }}>
                             <Bell size={20} />
                         </div>
@@ -189,7 +171,7 @@ const MyApplications = () => {
                                     </div>
                                     <div style={{ flex: 1 }}>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '0.5rem' }}>
-                                            <h3 style={{ fontSize: '1.3rem' }}>{app.title}</h3>
+                                            <h3 style={{ fontSize: '1.3rem' }}>{app.jobTitle}</h3>
                                             <span className="glass-card" style={{ 
                                                 padding: '0.3rem 1rem', 
                                                 fontSize: '0.85rem',
@@ -210,19 +192,51 @@ const MyApplications = () => {
                                             </div>
                                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-gray)' }}>
                                                 <Clock size={16} />
-                                                <span style={{ fontSize: '0.95rem' }}>Applied: {app.appliedDate}</span>
+                                                <span style={{ fontSize: '0.95rem' }}>Applied: {new Date(app.appliedDate).toLocaleDateString()}</span>
                                             </div>
                                         </div>
-                                        {app.interviewDate && (
+                                        
+                                        {/* Exam Date and Mode */}
+                                        {app.examDate && (
+                                            <div style={{ display: 'flex', gap: '1rem', marginBottom: '0.8rem', flexWrap: 'wrap' }}>
+                                                <div className="glass-card" style={{ 
+                                                    padding: '0.6rem 1rem', 
+                                                    background: 'rgba(245, 158, 11, 0.1)',
+                                                    display: 'inline-flex',
+                                                    alignItems: 'center',
+                                                    gap: '0.5rem'
+                                                }}>
+                                                    <Calendar size={16} style={{ color: '#f59e0b' }} />
+                                                    <span style={{ color: '#f59e0b', fontSize: '0.9rem' }}>Exam: {new Date(app.examDate).toLocaleDateString()}</span>
+                                                </div>
+                                                {app.mode && (
+                                                    <div className="glass-card" style={{ 
+                                                        padding: '0.6rem 1rem', 
+                                                        background: 'rgba(99, 102, 241, 0.1)',
+                                                        display: 'inline-flex',
+                                                        alignItems: 'center',
+                                                        gap: '0.5rem'
+                                                    }}>
+                                                        <span style={{ color: '#6366f1', fontSize: '0.9rem' }}>Mode: {app.mode}</span>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        )}
+                                        
+                                        {/* Interview Details */}
+                                        {app.interviewDetails && (
                                             <div className="glass-card" style={{ 
                                                 padding: '0.8rem 1rem', 
                                                 background: 'rgba(59, 130, 246, 0.1)',
-                                                display: 'inline-flex',
-                                                alignItems: 'center',
-                                                gap: '0.5rem'
+                                                marginBottom: '0.5rem'
                                             }}>
-                                                <Calendar size={16} style={{ color: '#3b82f6' }} />
-                                                <span style={{ color: '#3b82f6', fontSize: '0.9rem' }}>Interview on {app.interviewDate}</span>
+                                                <div style={{ display: 'flex', alignItems: 'start', gap: '0.5rem' }}>
+                                                    <Calendar size={16} style={{ color: '#3b82f6', marginTop: '2px' }} />
+                                                    <div style={{ flex: 1 }}>
+                                                        <span style={{ color: '#3b82f6', fontSize: '0.85rem', fontWeight: 600, display: 'block', marginBottom: '0.3rem' }}>Interview Details:</span>
+                                                        <span style={{ color: '#3b82f6', fontSize: '0.9rem' }}>{app.interviewDetails}</span>
+                                                    </div>
+                                                </div>
                                             </div>
                                         )}
                                     </div>

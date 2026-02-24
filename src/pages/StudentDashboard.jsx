@@ -1,17 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     LogOut, LayoutDashboard, Search, Bell, User, Briefcase,
     MapPin, Clock, DollarSign, Building2, TrendingUp, FileText,
-    Calendar, BookmarkPlus, ExternalLink, Filter, Sun, Moon
+    Calendar, BookmarkPlus, ExternalLink, Filter, Sun, Moon, CheckCircle
 } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
 
 const StudentDashboard = () => {
     const email = sessionStorage.getItem('userEmail') || 'student@demo.com';
+    const userId = sessionStorage.getItem('userId');
     const navigate = useNavigate();
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedFilter, setSelectedFilter] = useState('all');
+    const [showSuccess, setShowSuccess] = useState(false);
+    const [successMessage, setSuccessMessage] = useState('');
     const { theme, toggleTheme } = useTheme();
 
     const handleLogout = () => {
@@ -19,86 +22,125 @@ const StudentDashboard = () => {
         navigate('/');
     };
 
-    // Mock job data
-    const jobs = [
-        {
-            id: 1,
-            title: 'Software Engineer',
-            company: 'Google',
-            location: 'Bangalore, India',
-            type: 'Full-time',
-            salary: '₹15-20 LPA',
-            posted: '2 days ago',
-            logo: '🔍',
-            skills: ['React', 'Node.js', 'Python'],
-            description: 'Join our engineering team to build next-generation products.'
-        },
-        {
-            id: 2,
-            title: 'Frontend Developer',
-            company: 'Microsoft',
-            location: 'Hyderabad, India',
-            type: 'Full-time',
-            salary: '₹12-18 LPA',
-            posted: '1 week ago',
-            logo: '🪟',
-            skills: ['JavaScript', 'React', 'TypeScript'],
-            description: 'Build amazing user experiences for millions of users worldwide.'
-        },
-        {
-            id: 3,
-            title: 'Data Analyst Intern',
-            company: 'Amazon',
-            location: 'Mumbai, India',
-            type: 'Internship',
-            salary: '₹50k/month',
-            posted: '3 days ago',
-            logo: '📦',
-            skills: ['Python', 'SQL', 'Tableau'],
-            description: 'Work with large datasets to derive business insights.'
-        },
-        {
-            id: 4,
-            title: 'Full Stack Developer',
-            company: 'Flipkart',
-            location: 'Bangalore, India',
-            type: 'Full-time',
-            salary: '₹10-15 LPA',
-            posted: '5 days ago',
-            logo: '🛒',
-            skills: ['MERN Stack', 'Docker', 'AWS'],
-            description: 'Build scalable e-commerce solutions for millions of customers.'
-        },
-        {
-            id: 5,
-            title: 'UI/UX Designer',
-            company: 'Adobe',
-            location: 'Remote',
-            type: 'Full-time',
-            salary: '₹12-16 LPA',
-            posted: '1 day ago',
-            logo: '🎨',
-            skills: ['Figma', 'Adobe XD', 'Sketch'],
-            description: 'Design beautiful and intuitive user interfaces.'
-        },
-        {
-            id: 6,
-            title: 'Backend Engineer',
-            company: 'Netflix',
-            location: 'Bangalore, India',
-            type: 'Full-time',
-            salary: '₹18-25 LPA',
-            posted: '4 days ago',
-            logo: '🎬',
-            skills: ['Java', 'Spring Boot', 'Microservices'],
-            description: 'Build highly scalable streaming infrastructure.'
+    // Load jobs and applications from localStorage
+    const [jobs, setJobs] = useState([]);
+    const [myApplications, setMyApplications] = useState([]);
+    const [savedJobs, setSavedJobs] = useState([]);
+
+    useEffect(() => {
+        loadJobs();
+        loadMyApplications();
+        loadSavedJobs();
+        // Listen for storage changes
+        window.addEventListener('storage', () => {
+            loadJobs();
+            loadMyApplications();
+            loadSavedJobs();
+        });
+        return () => window.removeEventListener('storage', () => {
+            loadJobs();
+            loadMyApplications();
+            loadSavedJobs();
+        });
+    }, []);
+
+    const loadJobs = () => {
+        const allJobs = JSON.parse(localStorage.getItem('jobs') || '[]');
+        setJobs(allJobs);
+    };
+
+    const loadMyApplications = () => {
+        const allApplications = JSON.parse(localStorage.getItem('applications') || '[]');
+        const myApps = allApplications.filter(app => app.studentId === userId);
+        setMyApplications(myApps);
+    };
+
+    const loadSavedJobs = () => {
+        const allSavedJobs = JSON.parse(localStorage.getItem('savedJobs') || '[]');
+        const mySavedJobs = allSavedJobs.filter(job => job.studentId === userId);
+        setSavedJobs(mySavedJobs);
+    };
+
+    const handleSaveJob = (job) => {
+        const allSavedJobs = JSON.parse(localStorage.getItem('savedJobs') || '[]');
+        
+        // Check if already saved
+        const alreadySaved = allSavedJobs.some(saved => 
+            saved.jobId === job.id && saved.studentId === userId
+        );
+
+        if (alreadySaved) {
+            setSuccessMessage('Job already saved!');
+            setShowSuccess(true);
+            setTimeout(() => setShowSuccess(false), 3000);
+            return;
         }
-    ];
+
+        const savedJob = {
+            id: Date.now().toString(),
+            jobId: job.id,
+            studentId: userId,
+            studentEmail: email,
+            savedDate: new Date().toISOString(),
+            ...job
+        };
+
+        allSavedJobs.push(savedJob);
+        localStorage.setItem('savedJobs', JSON.stringify(allSavedJobs));
+        loadSavedJobs();
+
+        setSuccessMessage('Job saved successfully!');
+        setShowSuccess(true);
+        setTimeout(() => setShowSuccess(false), 3000);
+    };
+
+    const handleApply = (job) => {
+        // Check if already applied
+        const alreadyApplied = myApplications.some(app => app.jobId === job.id);
+        if (alreadyApplied) {
+            setSuccessMessage('You have already applied for this job!');
+            setShowSuccess(true);
+            setTimeout(() => setShowSuccess(false), 3000);
+            return;
+        }
+
+        const application = {
+            id: Date.now().toString(),
+            jobId: job.id,
+            jobTitle: job.title,
+            company: job.company,
+            location: job.location,
+            salary: job.salary,
+            logo: job.logo,
+            studentId: userId,
+            studentEmail: email,
+            studentName: sessionStorage.getItem('userName') || email.split('@')[0],
+            appliedDate: new Date().toISOString(),
+            status: 'Under Review',
+            statusColor: '#f59e0b',
+            examDate: job.examDate,
+            interviewDetails: job.interviewDetails,
+            mode: job.mode
+        };
+
+        // Save to localStorage
+        const applications = JSON.parse(localStorage.getItem('applications') || '[]');
+        applications.push(application);
+        localStorage.setItem('applications', JSON.stringify(applications));
+
+        // Reload applications
+        loadMyApplications();
+
+        // Show success message
+        setSuccessMessage('Job applied successfully!');
+        setShowSuccess(true);
+        setTimeout(() => setShowSuccess(false), 3000);
+    };
 
     const stats = [
-        { label: 'Jobs Applied', value: '12', icon: FileText, color: '#10b981' },
-        { label: 'Interviews', value: '3', icon: Calendar, color: '#3b82f6' },
-        { label: 'Saved Jobs', value: '8', icon: BookmarkPlus, color: '#f59e0b' }
+        { label: 'Jobs Applied', value: myApplications.length.toString(), icon: FileText, color: '#10b981' },
+        { label: 'Interviews', value: myApplications.filter(a => a.status === 'Interview Scheduled').length.toString(), icon: Calendar, color: '#3b82f6' },
+        { label: 'Saved Jobs', value: savedJobs.length.toString(), icon: BookmarkPlus, color: '#f59e0b' }
     ];
 
     const filteredJobs = jobs.filter(job => {
@@ -115,6 +157,28 @@ const StudentDashboard = () => {
 
     return (
         <div style={{ display: 'flex', height: '100vh', background: 'var(--bg)' }}>
+
+            {/* Success Notification */}
+            {showSuccess && (
+                <div style={{
+                    position: 'fixed',
+                    top: '2rem',
+                    right: '2rem',
+                    zIndex: 1000,
+                    background: 'linear-gradient(135deg, #10b981, #059669)',
+                    color: 'white',
+                    padding: '1rem 2rem',
+                    borderRadius: '12px',
+                    boxShadow: '0 8px 24px rgba(16, 185, 129, 0.3)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '1rem',
+                    animation: 'slideInRight 0.3s ease'
+                }}>
+                    <CheckCircle size={24} />
+                    <span style={{ fontWeight: 600, fontSize: '1rem' }}>{successMessage}</span>
+                </div>
+            )}
 
             {/* Sidebar */}
             <div className="glass" style={{ width: '280px', margin: '1rem', borderRight: '1px solid var(--glass-border)', display: 'flex', flexDirection: 'column', padding: '2rem' }}>
@@ -280,7 +344,7 @@ const StudentDashboard = () => {
                                                 {job.description}
                                             </p>
                                             <div style={{ display: 'flex', gap: '0.8rem', flexWrap: 'wrap' }}>
-                                                {job.skills.map(skill => (
+                                                {job.skills && Array.isArray(job.skills) && job.skills.map(skill => (
                                                     <span key={skill} className="glass-card" style={{ 
                                                         padding: '0.4rem 1rem', 
                                                         fontSize: '0.85rem',
@@ -309,10 +373,19 @@ const StudentDashboard = () => {
                                             </span>
                                         </div>
                                         <div style={{ display: 'flex', gap: '0.8rem' }}>
-                                            <button className="btn btn-outline" style={{ padding: '0.6rem', borderRadius: '8px' }}>
+                                            <button 
+                                                className="btn btn-outline" 
+                                                style={{ padding: '0.6rem', borderRadius: '8px' }}
+                                                onClick={() => handleSaveJob(job)}
+                                                title="Save Job"
+                                            >
                                                 <BookmarkPlus size={18} />
                                             </button>
-                                            <button className="btn btn-primary" style={{ padding: '0.6rem 1.5rem' }}>
+                                            <button 
+                                                className="btn btn-primary" 
+                                                style={{ padding: '0.6rem 1.5rem' }}
+                                                onClick={() => handleApply(job)}
+                                            >
                                                 <ExternalLink size={18} /> Apply
                                             </button>
                                         </div>

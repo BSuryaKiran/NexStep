@@ -1,72 +1,103 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     LogOut, User, Bell, Briefcase, FileText, BookmarkPlus, Calendar,
-    MapPin, Clock, DollarSign, Building2, ExternalLink, Trash2
+    MapPin, Clock, DollarSign, Building2, ExternalLink, Trash2, Sun, Moon, CheckCircle, Bookmark
 } from 'lucide-react';
+import { useTheme } from '../contexts/ThemeContext';
 
 const SavedJobs = () => {
     const email = sessionStorage.getItem('userEmail') || 'student@demo.com';
+    const userId = sessionStorage.getItem('userId');
     const navigate = useNavigate();
+    const { theme, toggleTheme } = useTheme();
+    const [savedJobs, setSavedJobs] = useState([]);
+    const [showSuccess, setShowSuccess] = useState(false);
+    const [successMessage, setSuccessMessage] = useState('');
 
     const handleLogout = () => {
         sessionStorage.clear();
         navigate('/');
     };
 
-    const savedJobs = [
-        {
-            id: 1,
-            title: 'UI/UX Designer',
-            company: 'Adobe',
-            location: 'Remote',
-            type: 'Full-time',
-            salary: '₹12-16 LPA',
-            savedDate: '2 days ago',
-            logo: '🎨',
-            skills: ['Figma', 'Adobe XD', 'Sketch'],
-            description: 'Design beautiful and intuitive user interfaces.'
-        },
-        {
-            id: 2,
-            title: 'Backend Engineer',
-            company: 'Netflix',
-            location: 'Bangalore, India',
-            type: 'Full-time',
-            salary: '₹18-25 LPA',
-            savedDate: '4 days ago',
-            logo: '🎬',
-            skills: ['Java', 'Spring Boot', 'Microservices'],
-            description: 'Build highly scalable streaming infrastructure.'
-        },
-        {
-            id: 3,
-            title: 'Mobile Developer',
-            company: 'Uber',
-            location: 'Hyderabad, India',
-            type: 'Full-time',
-            salary: '₹14-20 LPA',
-            savedDate: '1 week ago',
-            logo: '🚗',
-            skills: ['React Native', 'iOS', 'Android'],
-            description: 'Create seamless mobile experiences for millions of users.'
-        },
-        {
-            id: 4,
-            title: 'DevOps Engineer',
-            company: 'AWS',
-            location: 'Mumbai, India',
-            type: 'Full-time',
-            salary: '₹16-22 LPA',
-            savedDate: '1 week ago',
-            logo: '☁️',
-            skills: ['Docker', 'Kubernetes', 'AWS'],
-            description: 'Build and maintain cloud infrastructure.'
+    useEffect(() => {
+        loadSavedJobs();
+        window.addEventListener('storage', loadSavedJobs);
+        return () => window.removeEventListener('storage', loadSavedJobs);
+    }, []);
+
+    const loadSavedJobs = () => {
+        // Load saved jobs for this user from localStorage
+        const allSavedJobs = JSON.parse(localStorage.getItem('savedJobs') || '[]');
+        const mySavedJobs = allSavedJobs.filter(job => job.studentId === userId);
+        setSavedJobs(mySavedJobs);
+    };
+
+    const handleApply = (job) => {
+        // Check if already applied
+        const applications = JSON.parse(localStorage.getItem('applications') || '[]');
+        const alreadyApplied = applications.some(app => 
+            app.jobId === job.id && app.studentId === userId
+        );
+
+        if (alreadyApplied) {
+            setSuccessMessage('You have already applied to this job!');
+            setShowSuccess(true);
+            setTimeout(() => setShowSuccess(false), 3000);
+            return;
         }
-    ];
+
+        const application = {
+            id: Date.now().toString(),
+            jobId: job.id,
+            jobTitle: job.title,
+            company: job.company,
+            location: job.location,
+            salary: job.salary,
+            logo: job.logo,
+            studentId: userId,
+            studentEmail: email,
+            studentName: sessionStorage.getItem('userName') || email.split('@')[0],
+            appliedDate: new Date().toISOString(),
+            status: 'Under Review',
+            statusColor: '#f59e0b'
+        };
+
+        // Save to localStorage
+        applications.push(application);
+        localStorage.setItem('applications', JSON.stringify(applications));
+
+        // Show success message
+        setSuccessMessage('Job applied successfully!');
+        setShowSuccess(true);
+        setTimeout(() => setShowSuccess(false), 3000);
+    };
 
     return (
         <div style={{ display: 'flex', height: '100vh', background: 'var(--bg)' }}>
+
+            {/* Success Notification */}
+            {showSuccess && (
+                <div style={{
+                    position: 'fixed',
+                    top: '2rem',
+                    right: '2rem',
+                    zIndex: 1000,
+                    animation: 'slideIn 0.3s ease-out'
+                }}>
+                    <div className="glass" style={{
+                        padding: '1rem 1.5rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '1rem',
+                        background: 'rgba(16, 185, 129, 0.1)',
+                        border: '1px solid #10b981'
+                    }}>
+                        <CheckCircle size={20} style={{ color: '#10b981' }} />
+                        <span style={{ color: '#10b981', fontWeight: 500 }}>{successMessage}</span>
+                    </div>
+                </div>
+            )}
 
             {/* Sidebar */}
             <div className="glass" style={{ width: '280px', margin: '1rem', display: 'flex', flexDirection: 'column', padding: '2rem' }}>
@@ -115,6 +146,20 @@ const SavedJobs = () => {
                         <p style={{ color: 'var(--text-gray)' }}>Jobs you've bookmarked for later</p>
                     </div>
                     <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
+                        <button 
+                            onClick={toggleTheme}
+                            className="glass-card"
+                            style={{ 
+                                padding: '0.6rem', 
+                                borderRadius: '50%', 
+                                cursor: 'pointer',
+                                background: 'transparent',
+                                border: '1px solid var(--glass-border)'
+                            }}
+                            title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+                        >
+                            {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+                        </button>
                         <div className="glass-card" style={{ padding: '0.6rem', borderRadius: '50%', cursor: 'pointer' }}>
                             <Bell size={20} />
                         </div>
@@ -131,9 +176,26 @@ const SavedJobs = () => {
                     {savedJobs.length} jobs saved
                 </h2>
 
-                {/* Job Listings */}
-                <div style={{ display: 'grid', gap: '1.5rem' }}>
-                    {savedJobs.map((job, i) => (
+                {/* Empty State */}
+                {savedJobs.length === 0 ? (
+                    <div className="glass animate-fade-in" style={{ 
+                        padding: '3rem', 
+                        textAlign: 'center',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        gap: '1rem'
+                    }}>
+                        <Bookmark size={64} style={{ color: 'var(--primary)', opacity: 0.5 }} />
+                        <h3 style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>No Saved Jobs Yet</h3>
+                        <p style={{ color: 'var(--text-gray)', maxWidth: '500px', lineHeight: 1.6 }}>
+                            Browse available jobs and click the bookmark icon to save them for later. Your saved jobs will appear here.
+                        </p>
+                    </div>
+                ) : (
+                    /* Job Listings */
+                    <div style={{ display: 'grid', gap: '1.5rem' }}>
+                        {savedJobs.map((job, i) => (
                         <div key={job.id} className="glass animate-fade-in" style={{ padding: '2rem', animationDelay: `${i * 0.05}s` }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
                                 <div style={{ display: 'flex', gap: '1.5rem', flex: 1 }}>
@@ -201,7 +263,11 @@ const SavedJobs = () => {
                                         <button className="btn btn-outline" style={{ padding: '0.6rem', borderRadius: '8px', color: '#ef4444', borderColor: '#ef4444' }}>
                                             <Trash2 size={18} />
                                         </button>
-                                        <button className="btn btn-primary" style={{ padding: '0.6rem 1.5rem' }}>
+                                        <button 
+                                            className="btn btn-primary" 
+                                            style={{ padding: '0.6rem 1.5rem' }}
+                                            onClick={() => handleApply(job)}
+                                        >
                                             <ExternalLink size={18} /> Apply
                                         </button>
                                     </div>
@@ -209,7 +275,8 @@ const SavedJobs = () => {
                             </div>
                         </div>
                     ))}
-                </div>
+                    </div>
+                )}
             </div>
         </div>
     );

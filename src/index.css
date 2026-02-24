@@ -24,9 +24,17 @@
   --success: #10b981;
   --error: #ef4444;
   --warning: #ffc107;
-  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-transform: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-opacity: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   --gradient-bg: radial-gradient(circle at 0% 0%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
                   radial-gradient(circle at 100% 100%, rgba(236, 72, 153, 0.15) 0%, transparent 50%);
+  --hero-gradient: linear-gradient(135deg, #fff, #a5b4fc);
+  --features-bg: rgba(99, 102, 241, 0.03);
+  --cta-bg: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
+  --demo-button-bg: rgba(255, 193, 7, 0.1);
+  --demo-button-border: rgba(255, 193, 7, 0.3);
+  --demo-content-bg: rgba(255, 193, 7, 0.05);
+  --demo-content-border: rgba(255, 193, 7, 0.2);
 }
 
 /* Light Theme */
@@ -52,9 +60,17 @@
   --success: #10b981;
   --error: #ef4444;
   --warning: #f59e0b;
-  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-transform: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-opacity: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   --gradient-bg: radial-gradient(circle at 0% 0%, rgba(99, 102, 241, 0.08) 0%, transparent 50%),
                   radial-gradient(circle at 100% 100%, rgba(236, 72, 153, 0.08) 0%, transparent 50%);
+  --hero-gradient: linear-gradient(135deg, #1e293b, #6366f1);
+  --features-bg: rgba(99, 102, 241, 0.06);
+  --cta-bg: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(139, 92, 246, 0.08));
+  --demo-button-bg: rgba(245, 158, 11, 0.1);
+  --demo-button-border: rgba(245, 158, 11, 0.3);
+  --demo-content-bg: rgba(245, 158, 11, 0.05);
+  --demo-content-border: rgba(245, 158, 11, 0.2);
 }
 
 * {
@@ -70,7 +86,15 @@ body {
   min-height: 100vh;
   overflow-x: hidden;
   background-image: var(--gradient-bg);
-  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Disable all transitions during theme switch */
+.theme-switching,
+.theme-switching *,
+.theme-switching *::before,
+.theme-switching *::after {
+  transition: none !important;
+  animation: none !important;
 }
 
 #root {
@@ -92,7 +116,9 @@ body {
   backdrop-filter: blur(8px);
   border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 16px;
-  transition: var(--transition);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+              background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .glass-card:hover {
@@ -137,7 +163,9 @@ body {
   border: none;
   cursor: pointer;
   font-weight: 500;
-  transition: var(--transition);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+              box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              filter 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
@@ -185,7 +213,8 @@ body {
   border: 1px solid var(--input-border);
   border-radius: 12px;
   color: var(--text-primary);
-  transition: var(--transition);
+  transition: border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .form-input::placeholder {
@@ -227,7 +256,8 @@ body {
 
 /* Hover Lift Effect */
 .hover-lift {
-  transition: var(--transition);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .hover-lift:hover {
@@ -247,7 +277,8 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: var(--transition);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   color: var(--text-primary);
 }
 
@@ -259,4 +290,33 @@ body {
 
 .theme-toggle:active {
   transform: scale(0.95);
+}
+
+/* Hero gradient text - theme-aware */
+.hero-gradient-text {
+  background: var(--hero-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Features section background */
+.features-section {
+  background: var(--features-bg);
+}
+
+/* CTA section background */
+.cta-section {
+  background: var(--cta-bg);
+}
+
+/* Demo credentials boxes */
+.demo-button {
+  background: var(--demo-button-bg);
+  border: 1px solid var(--demo-button-border);
+}
+
+.demo-content {
+  background: var(--demo-content-bg);
+  border: 1px solid var(--demo-content-border);
 }

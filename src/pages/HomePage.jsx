@@ -16,14 +16,14 @@ const HomePage = () => {
     },
     {
       icon: Building2,
-      title: 'For Employers',
+      title: 'For Recruiters',
       description: 'Find the perfect candidates, manage recruitment drives, and connect with talented students efficiently.',
       color: '#8b5cf6'
     },
     {
       icon: Briefcase,
       title: 'For Officers',
-      description: 'Oversee placement activities, generate reports, and coordinate between students and employers seamlessly.',
+      description: 'Oversee placement activities, generate reports, and coordinate between students and recruiters seamlessly.',
       color: '#ec4899'
     },
     {
@@ -57,7 +57,7 @@ const HomePage = () => {
         padding: '1.5rem 3rem', 
         position: 'sticky', 
         top: 0, 
-        background: theme === 'dark' ? 'rgba(15, 23, 42, 0.8)' : 'rgba(248, 250, 252, 0.8)', 
+        background: 'var(--glass-bg)', 
         backdropFilter: 'blur(10px)',
         borderBottom: '1px solid var(--glass-border)',
         zIndex: 100
@@ -123,14 +123,11 @@ const HomePage = () => {
             fontSize: '4rem', 
             fontWeight: 800, 
             marginBottom: '1.5rem',
-            lineHeight: 1.2,
-            background: theme === 'dark' 
-              ? 'linear-gradient(135deg, #fff, #a5b4fc)'
-              : 'linear-gradient(135deg, #1e293b, #6366f1)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent'
+            lineHeight: 1.2
           }}>
-            Your Gateway to Career Success
+            <span className="hero-gradient-text">
+              Your Gateway to Career Success
+            </span>
           </h1>
           
           <p className="animate-fade-in" style={{ 
@@ -139,7 +136,7 @@ const HomePage = () => {
             marginBottom: '3rem',
             lineHeight: 1.8
           }}>
-            NexStep bridges the gap between talent and opportunity. A comprehensive platform connecting students, employers, and placement officers for seamless recruitment management.
+            NexStep bridges the gap between talent and opportunity. A comprehensive platform connecting students, recruiters, and placement officers for seamless recruitment management.
           </p>
 
           <div className="animate-fade-in" style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
@@ -184,9 +181,8 @@ const HomePage = () => {
       </section>
 
       {/* Features Section */}
-      <section style={{ 
-        padding: '5rem 3rem', 
-        background: theme === 'dark' ? 'rgba(99, 102, 241, 0.03)' : 'rgba(99, 102, 241, 0.06)'
+      <section className="features-section" style={{ 
+        padding: '5rem 3rem'
       }}>
         <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
@@ -263,11 +259,8 @@ const HomePage = () => {
       </section>
 
       {/* CTA Section */}
-      <section style={{ 
-        padding: '5rem 3rem', 
-        background: theme === 'dark' 
-          ? 'linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1))'
-          : 'linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(139, 92, 246, 0.08))',
+      <section className="cta-section" style={{ 
+        padding: '5rem 3rem',
         borderTop: '1px solid var(--glass-border)',
         borderBottom: '1px solid var(--glass-border)'
       }}>
@@ -276,7 +269,7 @@ const HomePage = () => {
             Ready to Transform Your Placement Experience?
           </h2>
           <p style={{ fontSize: '1.2rem', color: 'var(--text-gray)', marginBottom: '3rem' }}>
-            Join thousands of students, employers, and institutions already using NexStep
+            Join thousands of students, recruiters, and institutions already using NexStep
           </p>
           <button 
             onClick={() => navigate('/signup')}

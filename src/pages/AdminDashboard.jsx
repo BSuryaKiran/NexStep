@@ -4,13 +4,15 @@ import {
     LogOut, User, Bell, LayoutDashboard, Users, Briefcase,
     Building2, TrendingUp, Settings, Shield, Activity,
     Database, Lock, CheckCircle, AlertCircle, Edit, Trash2,
-    Plus, Search, Download, RefreshCw
+    Plus, Search, Download, RefreshCw, Sun, Moon
 } from 'lucide-react';
+import { useTheme } from '../contexts/ThemeContext';
 
 const AdminDashboard = () => {
     const email = sessionStorage.getItem('userEmail') || 'admin@system.com';
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState('overview');
+    const { theme, toggleTheme } = useTheme();
 
     const handleLogout = () => {
         sessionStorage.clear();
@@ -26,7 +28,7 @@ const AdminDashboard = () => {
 
     const userBreakdown = [
         { role: 'Students', count: 1850, percentage: 75, color: '#6366f1' },
-        { role: 'Employers', count: 156, percentage: 6, color: '#10b981' },
+        { role: 'Recruiters', count: 156, percentage: 6, color: '#10b981' },
         { role: 'Officers', count: 420, percentage: 17, color: '#f59e0b' },
         { role: 'Admins', count: 24, percentage: 2, color: '#ec4899' }
     ];
@@ -48,10 +50,10 @@ const AdminDashboard = () => {
 
     const allUsers = [
         { id: 1, name: 'Rahul Kumar', email: 'rahul@stu.edu', role: 'Student', status: 'Active', joined: '2026-01-10' },
-        { id: 2, name: 'Tech Corp HR', email: 'hr@techcorp.com', role: 'Employer', status: 'Active', joined: '2026-01-15' },
+        { id: 2, name: 'Tech Corp HR', email: 'hr@techcorp.com', role: 'Recruiter', status: 'Active', joined: '2026-01-15' },
         { id: 3, name: 'Dr. Meera Nair', email: 'meera@univ.edu', role: 'Officer', status: 'Active', joined: '2025-12-01' },
         { id: 4, name: 'Sneha Patel', email: 'sneha@stu.edu', role: 'Student', status: 'Inactive', joined: '2026-01-20' },
-        { id: 5, name: 'Infosys Recruiter', email: 'recruit@infosys.com', role: 'Employer', status: 'Active', joined: '2026-02-01' },
+        { id: 5, name: 'Infosys Recruiter', email: 'recruit@infosys.com', role: 'Recruiter', status: 'Active', joined: '2026-02-01' },
     ];
 
     const analyticsData = [
@@ -73,7 +75,7 @@ const AdminDashboard = () => {
 
     const roleColor = (role) => {
         if (role === 'Student') return { bg: 'rgba(99,102,241,0.1)', color: '#6366f1' };
-        if (role === 'Employer') return { bg: 'rgba(16,185,129,0.1)', color: '#10b981' };
+        if (role === 'Recruiter') return { bg: 'rgba(16,185,129,0.1)', color: '#10b981' };
         if (role === 'Officer') return { bg: 'rgba(245,158,11,0.1)', color: '#f59e0b' };
         return { bg: 'rgba(236,72,153,0.1)', color: '#ec4899' };
     };
@@ -119,6 +121,20 @@ const AdminDashboard = () => {
                         <p style={{ color: 'var(--text-gray)' }}>Monitor and manage the entire platform</p>
                     </div>
                     <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
+                        <button 
+                            onClick={toggleTheme}
+                            className="glass-card"
+                            style={{ 
+                                padding: '0.6rem', 
+                                borderRadius: '50%', 
+                                cursor: 'pointer',
+                                background: 'transparent',
+                                border: '1px solid var(--glass-border)'
+                            }}
+                            title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+                        >
+                            {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+                        </button>
                         <div className="glass-card" style={{ padding: '0.6rem', borderRadius: '50%', cursor: 'pointer', position: 'relative' }}>
                             <Bell size={20} />
                             <span style={{ position: 'absolute', top: '0', right: '0', width: '8px', height: '8px', background: '#ef4444', borderRadius: '50%' }}></span>

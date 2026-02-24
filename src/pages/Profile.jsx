@@ -2,13 +2,16 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     LogOut, User, Bell, Briefcase, FileText, BookmarkPlus, Calendar,
-    Mail, Phone, MapPin, Edit, Save, GraduationCap, Award, FileDown
+    Mail, Phone, MapPin, Edit, Save, GraduationCap, Award, FileDown, Sun, Moon
 } from 'lucide-react';
+import { useTheme } from '../contexts/ThemeContext';
 
 const Profile = () => {
     const email = sessionStorage.getItem('userEmail') || 'student@demo.com';
+    const userName = sessionStorage.getItem('userName') || 'Student';
     const navigate = useNavigate();
     const [isEditing, setIsEditing] = useState(false);
+    const { theme, toggleTheme } = useTheme();
 
     const handleLogout = () => {
         sessionStorage.clear();
@@ -16,8 +19,8 @@ const Profile = () => {
     };
 
     const [profile, setProfile] = useState({
-        name: 'Rahul Kumar',
-        email: 'rahul.kumar@university.edu',
+        name: userName,
+        email: email,
         phone: '+91 98765 43210',
         location: 'Bangalore, India',
         college: 'ABC University',
@@ -78,6 +81,20 @@ const Profile = () => {
                         <p style={{ color: 'var(--text-gray)' }}>Manage your personal information</p>
                     </div>
                     <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
+                        <button 
+                            onClick={toggleTheme}
+                            className="glass-card"
+                            style={{ 
+                                padding: '0.6rem', 
+                                borderRadius: '50%', 
+                                cursor: 'pointer',
+                                background: 'transparent',
+                                border: '1px solid var(--glass-border)'
+                            }}
+                            title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+                        >
+                            {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+                        </button>
                         <button 
                             onClick={() => setIsEditing(!isEditing)}
                             className={isEditing ? 'btn btn-primary' : 'btn btn-outline'}

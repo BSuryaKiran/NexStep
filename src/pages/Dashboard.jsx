@@ -3,13 +3,15 @@ import { useNavigate } from 'react-router-dom';
 import {
     LogOut, LayoutDashboard, Search, Bell, User,
     TrendingUp, Users, Calendar, FileText,
-    MapPin, Clock, DollarSign, Building2, GraduationCap
+    MapPin, Clock, DollarSign, Building2, GraduationCap, Sun, Moon
 } from 'lucide-react';
+import { useTheme } from '../contexts/ThemeContext';
 
 const Dashboard = () => {
     const role = sessionStorage.getItem('userRole') || 'Student';
     const email = sessionStorage.getItem('userEmail') || 'demo@user.com';
     const navigate = useNavigate();
+    const { theme, toggleTheme } = useTheme();
 
     const handleLogout = () => {
         sessionStorage.clear();
@@ -28,7 +30,7 @@ const Dashboard = () => {
                 { label: 'Interviews', value: '3', icon: Calendar, color: '#3b82f6' },
                 { label: 'Success Rate', value: '68%', icon: TrendingUp, color: '#f59e0b' }
             ];
-            case 'Employer': return [
+            case 'Recruiter': return [
                 { label: 'Applications', value: '1,280', icon: Users, color: '#6366f1' },
                 { label: 'Postings', value: '5', icon: LayoutDashboard, color: '#ec4899' },
                 { label: 'Hired', value: '14', icon: TrendingUp, color: '#10b981' }
@@ -78,6 +80,20 @@ const Dashboard = () => {
                         <p style={{ color: 'var(--text-gray)' }}>Welcome to your <span style={{ color: 'var(--primary)', fontWeight: 600 }}>{role}</span> Dashboard</p>
                     </div>
                     <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
+                        <button 
+                            onClick={toggleTheme}
+                            className="glass-card"
+                            style={{ 
+                                padding: '0.6rem', 
+                                borderRadius: '50%', 
+                                cursor: 'pointer',
+                                background: 'transparent',
+                                border: '1px solid var(--glass-border)'
+                            }}
+                            title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+                        >
+                            {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+                        </button>
                         <div className="glass-card" style={{ padding: '0.6rem', borderRadius: '50%' }}>
                             <Bell size={20} />
                         </div>

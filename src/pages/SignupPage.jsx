@@ -9,7 +9,8 @@ const SignupPage = () => {
     email: '',
     password: '',
     confirmPassword: '',
-    role: 'Student'
+    role: 'Student',
+    company: ''
   });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
@@ -18,7 +19,7 @@ const SignupPage = () => {
 
   const roles = [
     { id: 'Student', icon: GraduationCap, label: 'Student', desc: 'Apply for your dream jobs' },
-    { id: 'Employer', icon: Building2, label: 'Employer', desc: 'Find top talent for your company' },
+    { id: 'Recruiter', icon: Building2, label: 'Recruiter', desc: 'Find top talent for your company' },
     { id: 'Placement Officer', icon: Briefcase, label: 'Officer', desc: 'Manage placements & reports' },
     { id: 'Admin', icon: ShieldCheck, label: 'Admin', desc: 'System control & settings' }
   ];
@@ -36,14 +37,37 @@ const SignupPage = () => {
       setError('Please enter your name');
       return false;
     }
+    if (formData.role === 'Recruiter' && !formData.company.trim()) {
+      setError('Please enter your company name');
+      return false;
+    }
     if (!formData.email.trim()) {
       setError('Please enter your email');
       return false;
     }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      setError('Please enter a valid email address');
+    
+    // Email validation based on role
+    if (!formData.email.endsWith('@nexstep.com')) {
+      setError('Email must end with @nexstep.com');
       return false;
     }
+    
+    const emailPrefix = formData.email.split('@')[0];
+    
+    if (formData.role === 'Student') {
+      // Student email must be 10-digit ID
+      if (!/^\d{10}$/.test(emailPrefix)) {
+        setError('Student email must be a 10-digit ID number followed by @nexstep.com (e.g., 1234567890@nexstep.com)');
+        return false;
+      }
+    } else if (formData.role === 'Recruiter') {
+      // Recruiter email must be company name (matching the company field)
+      if (formData.company && emailPrefix !== formData.company.toLowerCase().replace(/\s+/g, '-')) {
+        setError(`Recruiter email must be ${formData.company.toLowerCase().replace(/\s+/g, '-')}@nexstep.com`);
+        return false;
+      }
+    }
+    
     if (formData.password.length < 6) {
       setError('Password must be at least 6 characters long');
       return false;
@@ -80,6 +104,7 @@ const SignupPage = () => {
       email: formData.email.toLowerCase().trim(),
       password: formData.password,
       role: formData.role,
+      company: formData.company.trim() || '',
       createdAt: new Date().toISOString()
     };
 
@@ -96,6 +121,9 @@ const SignupPage = () => {
       sessionStorage.setItem('userEmail', newUser.email);
       sessionStorage.setItem('userName', newUser.name);
       sessionStorage.setItem('userId', newUser.id);
+      if (newUser.company) {
+        sessionStorage.setItem('userCompany', newUser.company);
+      }
       navigate('/dashboard');
     }, 1500);
   };
@@ -235,6 +263,25 @@ const SignupPage = () => {
               </div>
             </div>
 
+            {formData.role === 'Recruiter' && (
+              <div className="form-group">
+                <label className="form-label">Company Name</label>
+                <div style={{ position: 'relative' }}>
+                  <Building2 size={18} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-gray)' }} />
+                  <input 
+                    type="text" 
+                    name="company"
+                    value={formData.company}
+                    onChange={handleChange}
+                    className="form-input" 
+                    placeholder="e.g., TechCorp" 
+                    style={{ paddingLeft: '3rem' }}
+                    required
+                  />
+                </div>
+              </div>
+            )}
+
             <div className="form-group">
               <label className="form-label">Email Address</label>
               <div style={{ position: 'relative' }}>
@@ -245,11 +292,24 @@ const SignupPage = () => {
                   value={formData.email}
                   onChange={handleChange}
                   className="form-input" 
-                  placeholder="name@company.com" 
+                  placeholder={
+                    formData.role === 'Student' 
+                      ? '1234567890@nexstep.com' 
+                      : formData.role === 'Recruiter'
+                      ? `${formData.company ? formData.company.toLowerCase().replace(/\s+/g, '-') : 'company-name'}@nexstep.com`
+                      : 'name@nexstep.com'
+                  }
                   style={{ paddingLeft: '3rem' }}
                   required
                 />
               </div>
+              <p style={{ fontSize: '0.8rem', color: 'var(--text-gray)', marginTop: '0.5rem' }}>
+                {formData.role === 'Student' 
+                  ? 'Use your 10-digit student ID' 
+                  : formData.role === 'Recruiter'
+                  ? 'Use your company name as prefix'
+                  : 'Must end with @nexstep.com'}
+              </p>
             </div>
 
             <div className="form-group">

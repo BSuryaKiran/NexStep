@@ -4,13 +4,15 @@ import {
     LogOut, User, Bell, LayoutDashboard, Users, Briefcase,
     Building2, FileText, TrendingUp, Calendar, CheckCircle,
     Clock, AlertCircle, BarChart3, Download, Plus, Search,
-    MapPin, Mail, Phone, Edit, Trash2, Eye
+    MapPin, Mail, Phone, Edit, Trash2, Eye, Sun, Moon
 } from 'lucide-react';
+import { useTheme } from '../contexts/ThemeContext';
 
 const PlacementOfficerDashboard = () => {
     const email = sessionStorage.getItem('userEmail') || 'officer@univ.edu';
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState('overview');
+    const { theme, toggleTheme } = useTheme();
 
     const handleLogout = () => {
         sessionStorage.clear();
@@ -111,6 +113,20 @@ const PlacementOfficerDashboard = () => {
                         <p style={{ color: 'var(--text-gray)' }}>Manage campus placements and track student progress</p>
                     </div>
                     <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
+                        <button 
+                            onClick={toggleTheme}
+                            className="glass-card"
+                            style={{ 
+                                padding: '0.6rem', 
+                                borderRadius: '50%', 
+                                cursor: 'pointer',
+                                background: 'transparent',
+                                border: '1px solid var(--glass-border)'
+                            }}
+                            title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+                        >
+                            {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+                        </button>
                         <button className="btn btn-primary" style={{ padding: '0.6rem 1.5rem' }}>
                             <Download size={18} /> Generate Report
                         </button>

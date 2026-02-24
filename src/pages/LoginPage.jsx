@@ -3,12 +3,15 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Lock, Mail, ChevronRight, GraduationCap, Briefcase, Building2, ShieldCheck, AlertCircle, ArrowLeft, Sun, Moon } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
 
-// Initialize demo users in localStorage if not present
+// Initialize demo users in localStorage (only if no users exist)
 const initializeDemoUsers = () => {
-  if (!localStorage.getItem('users')) {
+  const existingUsers = JSON.parse(localStorage.getItem('users') || '[]');
+  
+  // Only initialize if there are no users
+  if (existingUsers.length === 0) {
     const demoUsers = [
       { id: '1', email: 'student@demo.com', password: 'student123', role: 'Student', name: 'Demo Student' },
-      { id: '2', email: 'employer@demo.com', password: 'employer123', role: 'Employer', name: 'Demo Employer' },
+      { id: '2', email: 'recruiter@demo.com', password: 'recruiter123', role: 'Recruiter', name: 'Demo Recruiter' },
       { id: '3', email: 'officer@demo.com', password: 'officer123', role: 'Placement Officer', name: 'Demo Officer' },
       { id: '4', email: 'admin@demo.com', password: 'admin123', role: 'Admin', name: 'Demo Admin' }
     ];
@@ -36,8 +39,8 @@ const LoginPage = () => {
     // Get users from localStorage
     const users = JSON.parse(localStorage.getItem('users') || '[]');
     
-    // Find user with matching email and password
-    const user = users.find(u => u.email === email && u.password === password);
+    // Find user with matching email and password (email is case-insensitive)
+    const user = users.find(u => u.email === email.toLowerCase().trim() && u.password === password);
     
     if (user) {
       // Check if role matches (if you want strict role checking)
@@ -51,6 +54,9 @@ const LoginPage = () => {
       sessionStorage.setItem('userEmail', user.email);
       sessionStorage.setItem('userName', user.name);
       sessionStorage.setItem('userId', user.id);
+      if (user.company) {
+        sessionStorage.setItem('userCompany', user.company);
+      }
       
       // Navigate to dashboard
       navigate('/dashboard');
@@ -61,14 +67,14 @@ const LoginPage = () => {
 
   const roles = [
     { id: 'Student', icon: GraduationCap, label: 'Student', desc: 'Apply for your dream jobs' },
-    { id: 'Employer', icon: Building2, label: 'Employer', desc: 'Find top talent for your company' },
+    { id: 'Recruiter', icon: Building2, label: 'Recruiter', desc: 'Find top talent for your company' },
     { id: 'Placement Officer', icon: Briefcase, label: 'Officer', desc: 'Manage placements & reports' },
     { id: 'Admin', icon: ShieldCheck, label: 'Admin', desc: 'System control & settings' }
   ];
 
   const demoCredentials = {
     'Student': { email: 'student@demo.com', pass: 'student123' },
-    'Employer': { email: 'employer@demo.com', pass: 'employer123' },
+    'Recruiter': { email: 'recruiter@demo.com', pass: 'recruiter123' },
     'Placement Officer': { email: 'officer@demo.com', pass: 'officer123' },
     'Admin': { email: 'admin@demo.com', pass: 'admin123' }
   };
@@ -142,9 +148,8 @@ const LoginPage = () => {
           <div style={{ marginTop: '2rem' }}>
             <button 
               onClick={() => setShowDemo(!showDemo)}
+              className="demo-button"
               style={{
-                background: theme === 'dark' ? 'rgba(255, 193, 7, 0.1)' : 'rgba(245, 158, 11, 0.1)',
-                border: `1px solid ${theme === 'dark' ? 'rgba(255, 193, 7, 0.3)' : 'rgba(245, 158, 11, 0.3)'}`,
                 color: 'var(--warning)',
                 padding: '0.8rem 1rem',
                 borderRadius: '8px',
@@ -158,7 +163,7 @@ const LoginPage = () => {
             </button>
             
             {showDemo && (
-              <div style={{ marginTop: '1rem', padding: '1rem', background: theme === 'dark' ? 'rgba(255, 193, 7, 0.05)' : 'rgba(245, 158, 11, 0.05)', borderRadius: '8px', border: `1px solid ${theme === 'dark' ? 'rgba(255, 193, 7, 0.2)' : 'rgba(245, 158, 11, 0.2)'}` }}>
+              <div className="demo-content" style={{ marginTop: '1rem', padding: '1rem', borderRadius: '8px' }}>
                 <p style={{ fontSize: '0.75rem', color: 'var(--warning)', marginBottom: '0.8rem' }}>
                   <strong>Click a role above to auto-fill:</strong>
                 </p>
