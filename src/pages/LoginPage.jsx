@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Lock, Mail, ChevronRight, GraduationCap, Briefcase, Building2, ShieldCheck, AlertCircle, ArrowLeft, Sun, Moon } from 'lucide-react';
+import { Lock, Mail, ChevronRight, GraduationCap, Briefcase, Building2, ShieldCheck, AlertCircle, ArrowLeft, Sun, Moon, CheckCircle } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
+import CustomCaptcha from '../components/CustomCaptcha';
 
 // Initialize demo users in localStorage (only if no users exist)
 const initializeDemoUsers = () => {
@@ -25,6 +26,9 @@ const LoginPage = () => {
   const [activeRole, setActiveRole] = useState('Student');
   const [error, setError] = useState('');
   const [showDemo, setShowDemo] = useState(false);
+  const [isRobot, setIsRobot] = useState(false);
+  const [captchaVerified, setCaptchaVerified] = useState(false);
+  const [showCaptcha, setShowCaptcha] = useState(false);
   const navigate = useNavigate();
   const { theme, toggleTheme } = useTheme();
 
@@ -32,9 +36,56 @@ const LoginPage = () => {
     initializeDemoUsers();
   }, []);
 
+  // Reset captcha state when role changes
+  useEffect(() => {
+    setIsRobot(false);
+    setCaptchaVerified(false);
+  }, [activeRole]);
+
+  const handleRobotCheckbox = () => {
+    if (activeRole === 'Student') {
+      // For Student role, show CAPTCHA popup
+      if (!isRobot) {
+        setShowCaptcha(true);
+      } else {
+        setIsRobot(false);
+        setCaptchaVerified(false);
+      }
+    } else {
+      // For other roles, simple checkbox toggle
+      setIsRobot(!isRobot);
+    }
+  };
+
+  const handleCaptchaVerify = (success) => {
+    if (success) {
+      setIsRobot(true);
+      setCaptchaVerified(true);
+      setShowCaptcha(false);
+    }
+  };
+
+  const handleCaptchaClose = () => {
+    setShowCaptcha(false);
+    setIsRobot(false);
+    setCaptchaVerified(false);
+  };
+
   const handleLogin = (e) => {
     e.preventDefault();
     setError('');
+
+    // Check if "I am not a robot" is verified
+    if (!isRobot) {
+      setError('Please verify that you are not a robot.');
+      return;
+    }
+
+    // For Student role, ensure CAPTCHA was verified
+    if (activeRole === 'Student' && !captchaVerified) {
+      setError('Please complete the CAPTCHA verification.');
+      return;
+    }
 
     // Get users from localStorage
     const users = JSON.parse(localStorage.getItem('users') || '[]');
@@ -233,6 +284,46 @@ const LoginPage = () => {
               </div>
             </div>
 
+            {/* I am not a robot checkbox */}
+            <div style={{ 
+              padding: '1rem', 
+              border: '2px solid var(--glass-border)', 
+              borderRadius: '8px', 
+              marginBottom: '1.5rem',
+              background: 'var(--card-bg)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.75rem'
+            }}>
+              <input 
+                type="checkbox" 
+                id="robotCheck"
+                checked={isRobot}
+                onChange={handleRobotCheckbox}
+                style={{ 
+                  accentColor: 'var(--primary)',
+                  width: '20px',
+                  height: '20px',
+                  cursor: 'pointer'
+                }} 
+              />
+              <label 
+                htmlFor="robotCheck" 
+                style={{ 
+                  fontSize: '1rem', 
+                  color: 'var(--text-primary)', 
+                  cursor: 'pointer',
+                  fontWeight: 500,
+                  userSelect: 'none'
+                }}
+              >
+                I am not a robot
+              </label>
+              {activeRole === 'Student' && isRobot && (
+                <CheckCircle size={20} style={{ color: '#10b981', marginLeft: 'auto' }} />
+              )}
+            </div>
+
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
               <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem', color: 'var(--text-gray)', cursor: 'pointer' }}>
                 <input type="checkbox" style={{ accentColor: 'var(--primary)' }} /> Remember me
@@ -251,6 +342,14 @@ const LoginPage = () => {
         </div>
 
       </div>
+
+      {/* Custom CAPTCHA Modal */}
+      {showCaptcha && (
+        <CustomCaptcha 
+          onVerify={handleCaptchaVerify}
+          onClose={handleCaptchaClose}
+        />
+      )}
     </div>
   );
 };
