@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-    LogOut, User, Bell, LayoutDashboard, Users, Briefcase,
+    LogOut, User, LayoutDashboard, Users, Briefcase,
     Building2, FileText, TrendingUp, Calendar, CheckCircle,
     Clock, AlertCircle, BarChart3, Download, Plus, Search,
     MapPin, Mail, Phone, Edit, Trash2, Eye, Sun, Moon
 } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
+import NotificationBell from '../components/NotificationBell';
 
 const PlacementOfficerDashboard = () => {
     const email = sessionStorage.getItem('userEmail') || 'officer@univ.edu';
@@ -130,10 +131,7 @@ const PlacementOfficerDashboard = () => {
                         <button className="btn btn-primary" style={{ padding: '0.6rem 1.5rem' }}>
                             <Download size={18} /> Generate Report
                         </button>
-                        <div className="glass-card" style={{ padding: '0.6rem', borderRadius: '50%', cursor: 'pointer', position: 'relative' }}>
-                            <Bell size={20} />
-                            <span style={{ position: 'absolute', top: '0', right: '0', width: '8px', height: '8px', background: '#ef4444', borderRadius: '50%' }}></span>
-                        </div>
+                        <NotificationBell />
                         <div className="glass-card" style={{ padding: '0.5rem 1rem', display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
                             <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                 <User size={18} />

@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-    LogOut, User, Bell, Briefcase, Users, BarChart3,
+    LogOut, User, Briefcase, Users, BarChart3,
     Plus, Edit, Trash2, Eye, MapPin, DollarSign, Calendar,
     TrendingUp, Building2, CheckCircle, Sun, Moon, X, Check
 } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
+import NotificationBell from '../components/NotificationBell';
+import { useNotifications } from '../contexts/NotificationContext';
 
 const EmployerDashboard = () => {
     const email = sessionStorage.getItem('userEmail') || 'recruiter@demo.com';
@@ -18,6 +20,7 @@ const EmployerDashboard = () => {
     const [successMessage, setSuccessMessage] = useState('');
     const [selectedApplication, setSelectedApplication] = useState(null);
     const { theme, toggleTheme } = useTheme();
+    const { sendNotification } = useNotifications();
 
     const [newJob, setNewJob] = useState({
         title: '', location: '', type: 'Full-time',
@@ -130,14 +133,42 @@ const EmployerDashboard = () => {
 
     const handleUpdateApplicationStatus = (applicationId, newStatus) => {
         const allApplications = JSON.parse(localStorage.getItem('applications') || '[]');
+        let updatedApplication = null;
+        
         const updatedApplications = allApplications.map(app => {
             if (app.id === applicationId) {
-                return { ...app, status: newStatus, statusColor: newStatus === 'Interview Scheduled' ? '#3b82f6' : newStatus === 'Rejected' ? '#ef4444' : app.statusColor };
+                updatedApplication = { ...app, status: newStatus, statusColor: newStatus === 'Interview Scheduled' ? '#3b82f6' : newStatus === 'Rejected' ? '#ef4444' : app.statusColor };
+                return updatedApplication;
             }
             return app;
         });
+        
         localStorage.setItem('applications', JSON.stringify(updatedApplications));
         loadApplications();
+        
+        // Send notification to student
+        if (updatedApplication && updatedApplication.studentId) {
+            let notificationType = 'info';
+            let notificationMessage = '';
+            
+            if (newStatus === 'Accepted' || newStatus === 'Interview Scheduled') {
+                notificationType = 'success';
+                notificationMessage = `Great news! Your application for ${updatedApplication.jobTitle} has been ${newStatus.toLowerCase()}`;
+            } else if (newStatus === 'Rejected') {
+                notificationType = 'error';
+                notificationMessage = `Your application for ${updatedApplication.jobTitle} has been ${newStatus.toLowerCase()}`;
+            } else {
+                notificationMessage = `Your application status for ${updatedApplication.jobTitle} has been updated to: ${newStatus}`;
+            }
+            
+            sendNotification({
+                recipientId: updatedApplication.studentId,
+                title: 'Application Status Update',
+                message: notificationMessage,
+                type: notificationType,
+                actionUrl: '/applications'
+            });
+        }
         
         // Show success message
         setSuccessMessage(`Application ${newStatus.toLowerCase()}!`);
@@ -229,9 +260,7 @@ const EmployerDashboard = () => {
                         >
                             {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
                         </button>
-                        <div className="glass-card" style={{ padding: '0.6rem', borderRadius: '50%', cursor: 'pointer' }}>
-                            <Bell size={20} />
-                        </div>
+                        <NotificationBell />
                         <div className="glass-card" style={{ padding: '0.5rem 1rem', display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
                             <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                 <User size={18} />

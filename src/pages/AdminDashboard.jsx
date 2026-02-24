@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-    LogOut, User, Bell, LayoutDashboard, Users, Briefcase,
+    LogOut, User, LayoutDashboard, Users, Briefcase,
     Building2, TrendingUp, Settings, Shield, Activity,
     Database, Lock, CheckCircle, AlertCircle, Edit, Trash2,
     Plus, Search, Download, RefreshCw, Sun, Moon
 } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
+import NotificationBell from '../components/NotificationBell';
 
 const AdminDashboard = () => {
     const email = sessionStorage.getItem('userEmail') || 'admin@system.com';
@@ -135,10 +136,7 @@ const AdminDashboard = () => {
                         >
                             {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
                         </button>
-                        <div className="glass-card" style={{ padding: '0.6rem', borderRadius: '50%', cursor: 'pointer', position: 'relative' }}>
-                            <Bell size={20} />
-                            <span style={{ position: 'absolute', top: '0', right: '0', width: '8px', height: '8px', background: '#ef4444', borderRadius: '50%' }}></span>
-                        </div>
+                        <NotificationBell />
                         <div className="glass-card" style={{ padding: '0.5rem 1rem', display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
                             <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                 <Shield size={18} />

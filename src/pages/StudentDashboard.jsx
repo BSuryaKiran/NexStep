@@ -1,21 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-    LogOut, LayoutDashboard, Search, Bell, User, Briefcase,
+    LogOut, LayoutDashboard, Search, User, Briefcase,
     MapPin, Clock, DollarSign, Building2, TrendingUp, FileText,
     Calendar, BookmarkPlus, ExternalLink, Filter, Sun, Moon, CheckCircle
 } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
+import NotificationBell from '../components/NotificationBell';
+import { useNotifications } from '../contexts/NotificationContext';
 
 const StudentDashboard = () => {
     const email = sessionStorage.getItem('userEmail') || 'student@demo.com';
     const userId = sessionStorage.getItem('userId');
+    const userName = sessionStorage.getItem('userName') || email.split('@')[0];
     const navigate = useNavigate();
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedFilter, setSelectedFilter] = useState('all');
     const [showSuccess, setShowSuccess] = useState(false);
     const [successMessage, setSuccessMessage] = useState('');
     const { theme, toggleTheme } = useTheme();
+    const { sendNotification } = useNotifications();
 
     const handleLogout = () => {
         sessionStorage.clear();
@@ -89,6 +93,17 @@ const StudentDashboard = () => {
         localStorage.setItem('savedJobs', JSON.stringify(allSavedJobs));
         loadSavedJobs();
 
+        // Send notification to recruiter
+        if (job.recruiterId) {
+            sendNotification({
+                recipientId: job.recruiterId,
+                title: 'Job Saved',
+                message: `${userName} saved your job posting: ${job.title}`,
+                type: 'info',
+                actionUrl: '/dashboard'
+            });
+        }
+
         setSuccessMessage('Job saved successfully!');
         setShowSuccess(true);
         setTimeout(() => setShowSuccess(false), 3000);
@@ -130,6 +145,17 @@ const StudentDashboard = () => {
 
         // Reload applications
         loadMyApplications();
+
+        // Send notification to recruiter
+        if (job.recruiterId) {
+            sendNotification({
+                recipientId: job.recruiterId,
+                title: 'New Application Received',
+                message: `${userName} applied for: ${job.title}`,
+                type: 'success',
+                actionUrl: '/dashboard'
+            });
+        }
 
         // Show success message
         setSuccessMessage('Job applied successfully!');
@@ -235,9 +261,7 @@ const StudentDashboard = () => {
                         >
                             {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
                         </div>
-                        <div className="glass-card" style={{ padding: '0.6rem', borderRadius: '50%', cursor: 'pointer' }}>
-                            <Bell size={20} />
-                        </div>
+                        <NotificationBell />
                         <div className="glass-card" style={{ padding: '0.5rem 1rem', display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
                             <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                 <User size={18} />
