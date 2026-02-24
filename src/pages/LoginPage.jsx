@@ -25,7 +25,6 @@ const LoginPage = () => {
   const [password, setPassword] = useState('');
   const [activeRole, setActiveRole] = useState('Student');
   const [error, setError] = useState('');
-  const [showDemo, setShowDemo] = useState(false);
   const [isRobot, setIsRobot] = useState(false);
   const [captchaVerified, setCaptchaVerified] = useState(false);
   const [showCaptcha, setShowCaptcha] = useState(false);
@@ -194,37 +193,6 @@ const LoginPage = () => {
                 </div>
               </div>
             ))}
-          </div>
-
-          <div style={{ marginTop: '2rem' }}>
-            <button 
-              onClick={() => setShowDemo(!showDemo)}
-              className="demo-button"
-              style={{
-                color: 'var(--warning)',
-                padding: '0.8rem 1rem',
-                borderRadius: '8px',
-                fontSize: '0.85rem',
-                cursor: 'pointer',
-                width: '100%',
-                transition: 'all 0.3s ease'
-              }}
-            >
-              {showDemo ? 'Hide' : 'Show'} Demo Credentials
-            </button>
-            
-            {showDemo && (
-              <div className="demo-content" style={{ marginTop: '1rem', padding: '1rem', borderRadius: '8px' }}>
-                <p style={{ fontSize: '0.75rem', color: 'var(--warning)', marginBottom: '0.8rem' }}>
-                  <strong>Click a role above to auto-fill:</strong>
-                </p>
-                {Object.entries(demoCredentials).map(([role, creds]) => (
-                  <div key={role} style={{ fontSize: '0.7rem', color: 'var(--text-gray)', marginBottom: '0.3rem' }}>
-                    <strong>{role}:</strong> {creds.email}
-                  </div>
-                ))}
-              </div>
-            )}
           </div>
         </div>
 

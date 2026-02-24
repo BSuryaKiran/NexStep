@@ -93,7 +93,7 @@ const CustomCaptcha = ({ onVerify, onClose }) => {
           color: 'var(--text-primary)',
           textAlign: 'center'
         }}>
-          Verify You're Human
+          Full Stack Challenge
         </h2>
 
         {!showResult ? (
