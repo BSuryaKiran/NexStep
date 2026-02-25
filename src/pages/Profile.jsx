@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     LogOut, User, Bell, Briefcase, FileText, BookmarkPlus, Calendar,
-    Mail, Phone, MapPin, Edit, Save, GraduationCap, Award, FileDown, Sun, Moon
+    Mail, Phone, MapPin, Edit, Save, GraduationCap, Award, Upload, Sun, Moon
 } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
 
@@ -20,6 +20,8 @@ const Profile = () => {
 
     const [profile, setProfile] = useState({
         name: userName,
+        title: 'Full Stack Developer',
+        bio: 'Passionate developer looking for opportunities',
         email: email,
         phone: '+91 98765 43210',
         location: 'Bangalore, India',
@@ -27,6 +29,8 @@ const Profile = () => {
         degree: 'B.Tech in Computer Science',
         graduationYear: '2026',
         cgpa: '8.5',
+        experience: '0',
+        projects: '0',
         skills: ['JavaScript', 'React', 'Node.js', 'Python', 'SQL', 'MongoDB'],
         resume: 'rahul_kumar_resume.pdf'
     });
@@ -135,15 +139,31 @@ const Profile = () => {
                                 {profile.name.charAt(0)}
                             </div>
                             <h2 style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>{profile.name}</h2>
-                            <p style={{ color: 'var(--text-gray)', marginBottom: '1.5rem' }}>{profile.degree}</p>
+                            <p style={{ color: 'var(--primary)', marginBottom: '0.5rem', fontWeight: 600 }}>{profile.title}</p>
+                            <p style={{ color: 'var(--text-gray)', marginBottom: '1.5rem', fontSize: '0.9rem' }}>{profile.bio}</p>
                             
-                            <div style={{ padding: '1rem', background: 'rgba(99, 102, 241, 0.1)', borderRadius: '12px', marginBottom: '1rem' }}>
-                                <p style={{ fontSize: '0.85rem', color: 'var(--text-gray)', marginBottom: '0.3rem' }}>CGPA</p>
-                                <p style={{ fontSize: '1.8rem', fontWeight: 700, color: 'var(--primary)' }}>{profile.cgpa}</p>
+                            {/* Stats Row */}
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem', marginBottom: '1rem' }}>
+                                <div style={{ padding: '1rem', background: 'linear-gradient(135deg, #10b981, #34d399)', borderRadius: '12px', border: '2px solid rgba(255,255,255,0.2)' }}>
+                                    <p style={{ fontSize: '0.75rem', color: '#ffffff', marginBottom: '0.3rem', opacity: 0.9 }}>Experience</p>
+                                    <p style={{ fontSize: '1.3rem', fontWeight: 700, color: '#ffffff' }}>{profile.experience} years</p>
+                                </div>
+                                <div style={{ padding: '1rem', background: 'linear-gradient(135deg, #3b82f6, #06b6d4)', borderRadius: '12px', border: '2px solid rgba(255,255,255,0.2)' }}>
+                                    <p style={{ fontSize: '0.75rem', color: '#ffffff', marginBottom: '0.3rem', opacity: 0.9 }}>Projects</p>
+                                    <p style={{ fontSize: '1.3rem', fontWeight: 700, color: '#ffffff' }}>{profile.projects}</p>
+                                </div>
+                                <div style={{ padding: '1rem', background: 'linear-gradient(135deg, #f59e0b, #fbbf24)', borderRadius: '12px', border: '2px solid rgba(255,255,255,0.2)' }}>
+                                    <p style={{ fontSize: '0.75rem', color: '#ffffff', marginBottom: '0.3rem', opacity: 0.9 }}>CGPA</p>
+                                    <p style={{ fontSize: '1.3rem', fontWeight: 700, color: '#ffffff' }}>{profile.cgpa}</p>
+                                </div>
+                                <div style={{ padding: '1rem', background: 'linear-gradient(135deg, #7c3aed, #a78bfa)', borderRadius: '12px', border: '2px solid rgba(255,255,255,0.2)' }}>
+                                    <p style={{ fontSize: '0.75rem', color: '#ffffff', marginBottom: '0.3rem', opacity: 0.9 }}>Completeness</p>
+                                    <p style={{ fontSize: '1.3rem', fontWeight: 700, color: '#ffffff' }}>85%</p>
+                                </div>
                             </div>
 
                             <button className="btn btn-outline" style={{ width: '100%', justifyContent: 'center', marginTop: '1rem' }}>
-                                <FileDown size={18} /> Download Resume
+                                <Upload size={18} /> Upload Resume
                             </button>
                         </div>
 
@@ -185,6 +205,29 @@ const Profile = () => {
                                             style={{ paddingLeft: '3rem' }}
                                         />
                                     </div>
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label">Professional Title</label>
+                                    <input 
+                                        type="text" 
+                                        value={profile.title}
+                                        disabled={!isEditing}
+                                        className="form-input" 
+                                        placeholder="e.g., Full Stack Developer"
+                                    />
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label">Bio / About Me</label>
+                                    <textarea 
+                                        value={profile.bio}
+                                        disabled={!isEditing}
+                                        className="form-input" 
+                                        placeholder="Tell us about yourself..."
+                                        rows="3"
+                                        style={{ resize: 'vertical' }}
+                                    />
                                 </div>
 
                                 <div className="form-group">
@@ -235,7 +278,7 @@ const Profile = () => {
 
                         {/* Educational Information */}
                         <div className="glass" style={{ padding: '2rem' }}>
-                            <h3 style={{ fontSize: '1.3rem', marginBottom: '1.5rem' }}>Education</h3>
+                            <h3 style={{ fontSize: '1.3rem', marginBottom: '1.5rem' }}>Education & Experience</h3>
                             <div style={{ display: 'grid', gap: '1.5rem' }}>
                                 <div className="form-group">
                                     <label className="form-label">College/University</label>
@@ -279,6 +322,30 @@ const Profile = () => {
                                             value={profile.cgpa}
                                             disabled={!isEditing}
                                             className="form-input"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                                    <div className="form-group">
+                                        <label className="form-label">Experience (Years)</label>
+                                        <input 
+                                            type="text" 
+                                            value={profile.experience}
+                                            disabled={!isEditing}
+                                            className="form-input"
+                                            placeholder="0"
+                                        />
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label className="form-label">Projects Completed</label>
+                                        <input 
+                                            type="text" 
+                                            value={profile.projects}
+                                            disabled={!isEditing}
+                                            className="form-input"
+                                            placeholder="0"
                                         />
                                     </div>
                                 </div>

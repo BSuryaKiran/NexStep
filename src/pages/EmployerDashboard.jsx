@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import {
     LogOut, User, Briefcase, Users, BarChart3,
     Plus, Edit, Trash2, Eye, MapPin, DollarSign, Calendar,
-    TrendingUp, Building2, CheckCircle, Sun, Moon, X, Check
+    TrendingUp, Building2, CheckCircle, Sun, Moon, X, Check, FileDown
 } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
 import NotificationBell from '../components/NotificationBell';
@@ -66,9 +66,9 @@ const EmployerDashboard = () => {
     };
 
     const stats = [
-        { label: 'Total Applications', value: applications.length.toString(), icon: Users, color: '#6366f1' },
-        { label: 'Active Jobs', value: postedJobs.length.toString(), icon: Briefcase, color: '#10b981' },
-        { label: 'Hired This Month', value: applications.filter(a => a.status === 'Offer Sent').length.toString(), icon: TrendingUp, color: '#f59e0b' }
+        { label: 'Total Applications', value: applications.length.toString(), icon: Users, color: '#f59e0b', gradient: 'linear-gradient(135deg, #f59e0b, #fbbf24)' },
+        { label: 'Active Jobs', value: postedJobs.length.toString(), icon: Briefcase, color: '#10b981', gradient: 'linear-gradient(135deg, #10b981, #34d399)' },
+        { label: 'Hired This Month', value: applications.filter(a => a.status === 'Offer Sent').length.toString(), icon: TrendingUp, color: '#7c3aed', gradient: 'linear-gradient(135deg, #7c3aed, #a78bfa)' }
     ];
 
     const statusColor = (status) => {
@@ -209,8 +209,8 @@ const EmployerDashboard = () => {
             )}
 
             {/* Sidebar */}
-            <div className="glass" style={{ width: '280px', margin: '1rem', borderRight: '1px solid var(--glass-border)', display: 'flex', flexDirection: 'column', padding: '2rem' }}>
-                <h2 className="text-gradient" style={{ marginBottom: '3rem', fontSize: '1.8rem' }}>NexStep</h2>
+            <div className="glass" style={{ width: '280px', margin: '1rem', borderRight: '2px solid var(--glass-border)', display: 'flex', flexDirection: 'column', padding: '2rem', background: 'linear-gradient(180deg, rgba(245, 158, 11, 0.08) 0%, rgba(139, 92, 246, 0.05) 100%)' }}>
+                <h2 className="text-gradient" style={{ marginBottom: '3rem', fontSize: '1.8rem', fontWeight: 700 }}>NexStep</h2>
                 <nav style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', flex: 1 }}>
                     {navItems.map(({ key, icon: Icon, label }) => (
                         <div
@@ -219,14 +219,15 @@ const EmployerDashboard = () => {
                             className="glass-card"
                             style={{
                                 padding: '0.8rem 1.2rem',
-                                background: activeTab === key ? 'rgba(99, 102, 241, 0.1)' : 'transparent',
-                                border: activeTab === key ? '1px solid var(--primary)' : '1px solid transparent',
-                                cursor: 'pointer'
+                                background: activeTab === key ? 'linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(251, 191, 36, 0.15))' : 'transparent',
+                                border: activeTab === key ? '2px solid #f59e0b' : '1px solid transparent',
+                                cursor: 'pointer',
+                                boxShadow: activeTab === key ? '0 4px 15px rgba(245, 158, 11, 0.3)' : 'none'
                             }}
                         >
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', color: activeTab === key ? 'var(--primary)' : 'var(--text-gray)' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', color: activeTab === key ? '#f59e0b' : 'var(--text-gray)' }}>
                                 <Icon size={20} />
-                                <span style={{ fontWeight: activeTab === key ? 600 : 400 }}>{label}</span>
+                                <span style={{ fontWeight: activeTab === key ? 700 : 400 }}>{label}</span>
                             </div>
                         </div>
                     ))}
@@ -273,14 +274,14 @@ const EmployerDashboard = () => {
                 {/* Stats Grid */}
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.5rem', marginBottom: '2rem' }}>
                     {stats.map((stat, i) => (
-                        <div key={i} className="glass animate-fade-in" style={{ padding: '1.5rem', animationDelay: `${i * 0.1}s` }}>
+                        <div key={i} className="glass animate-fade-in" style={{ padding: '1.8rem', animationDelay: `${i * 0.1}s`, background: stat.gradient, border: '2px solid rgba(255,255,255,0.2)', boxShadow: '0 8px 25px rgba(0,0,0,0.3)' }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
-                                <div style={{ padding: '0.8rem', borderRadius: '12px', background: `${stat.color}15`, color: stat.color }}>
-                                    <stat.icon size={20} />
+                                <div style={{ padding: '1rem', borderRadius: '14px', background: 'rgba(255,255,255,0.2)', color: '#ffffff', boxShadow: '0 4px 15px rgba(0,0,0,0.2)' }}>
+                                    <stat.icon size={24} />
                                 </div>
                             </div>
-                            <h3 style={{ fontSize: '1.8rem', marginBottom: '0.3rem' }}>{stat.value}</h3>
-                            <p style={{ fontSize: '0.9rem', color: 'var(--text-gray)' }}>{stat.label}</p>
+                            <h3 style={{ fontSize: '2rem', marginBottom: '0.4rem', fontWeight: 700, color: 'var(--text-primary)' }}>{stat.value}</h3>
+                            <p style={{ fontSize: '0.95rem', color: 'var(--text-primary)', fontWeight: 500 }}>{stat.label}</p>
                         </div>
                     ))}
                 </div>
@@ -630,6 +631,10 @@ const EmployerDashboard = () => {
                                     <p style={{ color: 'var(--text-gray)', fontSize: '0.95rem', lineHeight: 1.6, whiteSpace: 'pre-line' }}>{selectedApplication.interviewDetails}</p>
                                 </div>
                             )}
+
+                            <button className="btn btn-primary" style={{ width: '100%', justifyContent: 'center' }}>
+                                <FileDown size={18} /> Download Resume
+                            </button>
 
                             {selectedApplication.status === 'Under Review' && (
                                 <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>

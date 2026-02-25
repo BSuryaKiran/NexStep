@@ -164,9 +164,9 @@ const StudentDashboard = () => {
     };
 
     const stats = [
-        { label: 'Jobs Applied', value: myApplications.length.toString(), icon: FileText, color: '#10b981' },
-        { label: 'Interviews', value: myApplications.filter(a => a.status === 'Interview Scheduled').length.toString(), icon: Calendar, color: '#3b82f6' },
-        { label: 'Saved Jobs', value: savedJobs.length.toString(), icon: BookmarkPlus, color: '#f59e0b' }
+        { label: 'Jobs Applied', value: myApplications.length.toString(), icon: FileText, color: '#10b981', gradient: 'linear-gradient(135deg, #10b981, #34d399)' },
+        { label: 'Interviews', value: myApplications.filter(a => a.status === 'Interview Scheduled').length.toString(), icon: Calendar, color: '#3b82f6', gradient: 'linear-gradient(135deg, #3b82f6, #06b6d4)' },
+        { label: 'Saved Jobs', value: savedJobs.length.toString(), icon: BookmarkPlus, color: '#f59e0b', gradient: 'linear-gradient(135deg, #f59e0b, #fbbf24)' }
     ];
 
     const filteredJobs = jobs.filter(job => {
@@ -207,13 +207,13 @@ const StudentDashboard = () => {
             )}
 
             {/* Sidebar */}
-            <div className="glass" style={{ width: '280px', margin: '1rem', borderRight: '1px solid var(--glass-border)', display: 'flex', flexDirection: 'column', padding: '2rem' }}>
-                <h2 className="text-gradient" style={{ marginBottom: '3rem', fontSize: '1.8rem' }}>NexStep</h2>
+            <div className="glass" style={{ width: '280px', margin: '1rem', borderRight: '2px solid var(--glass-border)', display: 'flex', flexDirection: 'column', padding: '2rem', background: 'linear-gradient(180deg, rgba(6, 182, 212, 0.08) 0%, rgba(139, 92, 246, 0.05) 100%)' }}>
+                <h2 className="text-gradient" style={{ marginBottom: '3rem', fontSize: '1.8rem', fontWeight: 700 }}>NexStep</h2>
 
                 <nav style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', flex: 1 }}>
-                    <div className="glass-card" style={{ padding: '0.8rem 1.2rem', background: 'rgba(99, 102, 241, 0.1)', border: '1px solid var(--primary)', cursor: 'pointer' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', color: 'var(--primary)' }}>
-                            <Briefcase size={20} /> <span style={{ fontWeight: 600 }}>Browse Jobs</span>
+                    <div className="glass-card" style={{ padding: '0.8rem 1.2rem', background: 'linear-gradient(135deg, rgba(6, 182, 212, 0.2), rgba(59, 130, 246, 0.15))', border: '2px solid var(--student-accent)', cursor: 'pointer', boxShadow: '0 4px 15px rgba(6, 182, 212, 0.3)' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', color: '#06b6d4' }}>
+                            <Briefcase size={20} /> <span style={{ fontWeight: 700 }}>Browse Jobs</span>
                         </div>
                     </div>
                     <div className="glass-card" style={{ padding: '0.8rem 1.2rem', cursor: 'pointer' }} onClick={() => navigate('/applications')}>
@@ -274,14 +274,14 @@ const StudentDashboard = () => {
                 {/* Stats Grid */}
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.5rem', marginBottom: '2rem' }}>
                     {stats.map((stat, i) => (
-                        <div key={i} className="glass animate-fade-in" style={{ padding: '1.5rem', animationDelay: `${i * 0.1}s` }}>
+                        <div key={i} className="glass animate-fade-in" style={{ padding: '1.8rem', animationDelay: `${i * 0.1}s`, background: stat.gradient, border: '2px solid rgba(255,255,255,0.2)', boxShadow: `0 8px 25px rgba(0,0,0,0.3)` }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
-                                <div style={{ padding: '0.8rem', borderRadius: '12px', background: `${stat.color}15`, color: stat.color }}>
-                                    <stat.icon size={20} />
+                                <div style={{ padding: '1rem', borderRadius: '14px', background: 'rgba(255,255,255,0.2)', color: '#ffffff', boxShadow: '0 4px 15px rgba(0,0,0,0.2)' }}>
+                                    <stat.icon size={24} />
                                 </div>
                             </div>
-                            <h3 style={{ fontSize: '1.8rem', marginBottom: '0.3rem' }}>{stat.value}</h3>
-                            <p style={{ fontSize: '0.9rem', color: 'var(--text-gray)' }}>{stat.label}</p>
+                            <h3 style={{ fontSize: '2rem', marginBottom: '0.4rem', fontWeight: 700, color: 'var(--text-primary)' }}>{stat.value}</h3>
+                            <p style={{ fontSize: '0.95rem', color: 'var(--text-primary)', fontWeight: 500 }}>{stat.label}</p>
                         </div>
                     ))}
                 </div>
@@ -339,12 +339,14 @@ const StudentDashboard = () => {
                                         <div style={{ 
                                             width: '64px', 
                                             height: '64px', 
-                                            borderRadius: '12px', 
-                                            background: 'rgba(99, 102, 241, 0.1)', 
+                                            borderRadius: '14px', 
+                                            background: 'linear-gradient(135deg, #7c3aed, #06b6d4)', 
                                             display: 'flex', 
                                             alignItems: 'center', 
                                             justifyContent: 'center',
-                                            fontSize: '2rem'
+                                            fontSize: '2rem',
+                                            boxShadow: '0 8px 20px rgba(124, 58, 237, 0.3)',
+                                            border: '2px solid rgba(168, 85, 247, 0.3)'
                                         }}>
                                             {job.logo}
                                         </div>
@@ -368,12 +370,14 @@ const StudentDashboard = () => {
                                                 {job.description}
                                             </p>
                                             <div style={{ display: 'flex', gap: '0.8rem', flexWrap: 'wrap' }}>
-                                                {job.skills && Array.isArray(job.skills) && job.skills.map(skill => (
+                                                {job.skills && Array.isArray(job.skills) && job.skills.map((skill, idx) => (
                                                     <span key={skill} className="glass-card" style={{ 
-                                                        padding: '0.4rem 1rem', 
+                                                        padding: '0.5rem 1.1rem', 
                                                         fontSize: '0.85rem',
-                                                        background: 'rgba(99, 102, 241, 0.1)',
-                                                        color: 'var(--primary)'
+                                                        background: `linear-gradient(135deg, ${['#7c3aed', '#06b6d4', '#10b981', '#f59e0b', '#f43f5e'][idx % 5]}20, ${['#7c3aed', '#06b6d4', '#10b981', '#f59e0b', '#f43f5e'][idx % 5]}15)`,
+                                                        color: 'var(--text-primary)',
+                                                        border: `2px solid ${['#7c3aed', '#06b6d4', '#10b981', '#f59e0b', '#f43f5e'][idx % 5]}40`,
+                                                        fontWeight: 600
                                                     }}>
                                                         {skill}
                                                     </span>

@@ -21,10 +21,10 @@ const PlacementOfficerDashboard = () => {
     };
 
     const stats = [
-        { label: 'Total Students', value: '1,250', icon: Users, color: '#6366f1' },
-        { label: 'Placed Students', value: '820', icon: CheckCircle, color: '#10b981' },
-        { label: 'Active Companies', value: '45', icon: Building2, color: '#f59e0b' },
-        { label: 'Placement Rate', value: '65.6%', icon: TrendingUp, color: '#ec4899' }
+        { label: 'Total Students', value: '1,250', icon: Users, color: '#8b5cf6', gradient: 'linear-gradient(135deg, #8b5cf6, #a78bfa)' },
+        { label: 'Placed Students', value: '820', icon: CheckCircle, color: '#10b981', gradient: 'linear-gradient(135deg, #10b981, #34d399)' },
+        { label: 'Active Companies', value: '45', icon: Building2, color: '#f59e0b', gradient: 'linear-gradient(135deg, #f59e0b, #fbbf24)' },
+        { label: 'Placement Rate', value: '65.6%', icon: TrendingUp, color: '#06b6d4', gradient: 'linear-gradient(135deg, #06b6d4, #22d3ee)' }
     ];
 
     const recentPlacements = [
@@ -77,8 +77,8 @@ const PlacementOfficerDashboard = () => {
         <div style={{ display: 'flex', height: '100vh', background: 'var(--bg)' }}>
 
             {/* Sidebar */}
-            <div className="glass" style={{ width: '280px', margin: '1rem', borderRight: '1px solid var(--glass-border)', display: 'flex', flexDirection: 'column', padding: '2rem' }}>
-                <h2 className="text-gradient" style={{ marginBottom: '3rem', fontSize: '1.8rem' }}>NexStep</h2>
+            <div className="glass" style={{ width: '280px', margin: '1rem', borderRight: '2px solid var(--glass-border)', display: 'flex', flexDirection: 'column', padding: '2rem', background: 'linear-gradient(180deg, rgba(139, 92, 246, 0.08) 0%, rgba(124, 58, 237, 0.05) 100%)' }}>
+                <h2 className="text-gradient" style={{ marginBottom: '3rem', fontSize: '1.8rem', fontWeight: 700 }}>NexStep</h2>
                 <nav style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', flex: 1 }}>
                     {navItems.map(({ key, icon: Icon, label }) => (
                         <div
@@ -87,14 +87,15 @@ const PlacementOfficerDashboard = () => {
                             className="glass-card"
                             style={{
                                 padding: '0.8rem 1.2rem',
-                                background: activeTab === key ? 'rgba(99, 102, 241, 0.1)' : 'transparent',
-                                border: activeTab === key ? '1px solid var(--primary)' : '1px solid transparent',
-                                cursor: 'pointer'
+                                background: activeTab === key ? 'linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(167, 139, 250, 0.15))' : 'transparent',
+                                border: activeTab === key ? '2px solid #8b5cf6' : '1px solid transparent',
+                                cursor: 'pointer',
+                                boxShadow: activeTab === key ? '0 4px 15px rgba(139, 92, 246, 0.3)' : 'none'
                             }}
                         >
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', color: activeTab === key ? 'var(--primary)' : 'var(--text-gray)' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', color: activeTab === key ? '#8b5cf6' : 'var(--text-gray)' }}>
                                 <Icon size={20} />
-                                <span style={{ fontWeight: activeTab === key ? 600 : 400 }}>{label}</span>
+                                <span style={{ fontWeight: activeTab === key ? 700 : 400 }}>{label}</span>
                             </div>
                         </div>
                     ))}
@@ -144,14 +145,14 @@ const PlacementOfficerDashboard = () => {
                 {/* Stats Grid */}
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1.5rem', marginBottom: '2rem' }}>
                     {stats.map((stat, i) => (
-                        <div key={i} className="glass animate-fade-in" style={{ padding: '1.5rem', animationDelay: `${i * 0.1}s` }}>
+                        <div key={i} className="glass animate-fade-in" style={{ padding: '1.8rem', animationDelay: `${i * 0.1}s`, background: stat.gradient, border: '2px solid rgba(255,255,255,0.2)', boxShadow: '0 8px 25px rgba(0,0,0,0.3)' }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
-                                <div style={{ padding: '0.8rem', borderRadius: '12px', background: `${stat.color}15`, color: stat.color }}>
-                                    <stat.icon size={20} />
+                                <div style={{ padding: '1rem', borderRadius: '14px', background: 'rgba(255,255,255,0.2)', color: '#ffffff', boxShadow: '0 4px 15px rgba(0,0,0,0.2)' }}>
+                                    <stat.icon size={24} />
                                 </div>
                             </div>
-                            <h3 style={{ fontSize: '1.8rem', marginBottom: '0.3rem' }}>{stat.value}</h3>
-                            <p style={{ fontSize: '0.9rem', color: 'var(--text-gray)' }}>{stat.label}</p>
+                            <h3 style={{ fontSize: '2rem', marginBottom: '0.4rem', fontWeight: 700, color: 'var(--text-primary)' }}>{stat.value}</h3>
+                            <p style={{ fontSize: '0.95rem', color: 'var(--text-primary)', fontWeight: 500 }}>{stat.label}</p>
                         </div>
                     ))}
                 </div>

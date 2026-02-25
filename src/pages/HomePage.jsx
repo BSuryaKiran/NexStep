@@ -12,33 +12,37 @@ const HomePage = () => {
       icon: GraduationCap,
       title: 'For Students',
       description: 'Access hundreds of placement opportunities, track applications, and prepare for interviews all in one place.',
-      color: '#6366f1'
+      color: '#06b6d4',
+      gradient: 'linear-gradient(135deg, #06b6d4, #3b82f6)'
     },
     {
       icon: Building2,
       title: 'For Recruiters',
       description: 'Find the perfect candidates, manage recruitment drives, and connect with talented students efficiently.',
-      color: '#8b5cf6'
+      color: '#f59e0b',
+      gradient: 'linear-gradient(135deg, #f59e0b, #fbbf24)'
     },
     {
       icon: Briefcase,
       title: 'For Officers',
       description: 'Oversee placement activities, generate reports, and coordinate between students and recruiters seamlessly.',
-      color: '#ec4899'
+      color: '#8b5cf6',
+      gradient: 'linear-gradient(135deg, #8b5cf6, #a78bfa)'
     },
     {
       icon: ShieldCheck,
       title: 'Admin Control',
       description: 'Complete system management, user administration, and advanced analytics at your fingertips.',
-      color: '#f59e0b'
+      color: '#ec4899',
+      gradient: 'linear-gradient(135deg, #ec4899, #f472b6)'
     }
   ];
 
   const stats = [
-    { icon: Users, value: '10,000+', label: 'Active Users' },
-    { icon: Building2, value: '500+', label: 'Partner Companies' },
-    { icon: Award, value: '95%', label: 'Placement Rate' },
-    { icon: TrendingUp, value: '15K+', label: 'Jobs Posted' }
+    { icon: Users, value: '10,000+', label: 'Active Users', color: '#7c3aed', gradient: 'linear-gradient(135deg, #7c3aed, #a78bfa)' },
+    { icon: Building2, value: '500+', label: 'Partner Companies', color: '#10b981', gradient: 'linear-gradient(135deg, #10b981, #34d399)' },
+    { icon: Award, value: '95%', label: 'Placement Rate', color: '#f59e0b', gradient: 'linear-gradient(135deg, #f59e0b, #fbbf24)' },
+    { icon: TrendingUp, value: '15K+', label: 'Jobs Posted', color: '#ec4899', gradient: 'linear-gradient(135deg, #ec4899, #f472b6)' }
   ];
 
   const benefits = [
@@ -67,11 +71,12 @@ const HomePage = () => {
             <div style={{ 
               width: '40px', 
               height: '40px', 
-              background: 'linear-gradient(135deg, #6366f1, #8b5cf6)', 
+              background: 'linear-gradient(135deg, #7c3aed, #06b6d4)', 
               borderRadius: '10px',
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center'
+              justifyContent: 'center',
+              boxShadow: '0 4px 15px rgba(124, 58, 237, 0.4)'
             }}>
               <Target size={24} color="white" />
             </div>
@@ -171,10 +176,10 @@ const HomePage = () => {
           gap: '2rem' 
         }}>
           {stats.map((stat, index) => (
-            <div key={index} className="glass" style={{ padding: '2rem', textAlign: 'center' }}>
-              <stat.icon size={32} style={{ color: 'var(--primary)', margin: '0 auto 1rem' }} />
+            <div key={index} className="glass" style={{ padding: '2rem', textAlign: 'center', background: stat.gradient, border: '2px solid rgba(255,255,255,0.2)', boxShadow: '0 8px 25px rgba(0,0,0,0.3)' }}>
+              <stat.icon size={32} style={{ color: '#ffffff', margin: '0 auto 1rem' }} />
               <h3 style={{ fontSize: '2.5rem', fontWeight: 700, marginBottom: '0.5rem', color: 'var(--text-primary)' }}>{stat.value}</h3>
-              <p style={{ color: 'var(--text-gray)' }}>{stat.label}</p>
+              <p style={{ color: 'var(--text-primary)', fontWeight: 600 }}>{stat.label}</p>
             </div>
           ))}
         </div>
@@ -200,21 +205,23 @@ const HomePage = () => {
             gap: '2rem' 
           }}>
             {features.map((feature, index) => (
-              <div key={index} className="glass hover-lift" style={{ padding: '2.5rem' }}>
+              <div key={index} className="glass hover-lift" style={{ padding: '2.5rem', background: feature.gradient, border: '2px solid rgba(255,255,255,0.2)', boxShadow: '0 8px 25px rgba(0,0,0,0.3)' }}>
                 <div style={{ 
                   width: '60px', 
                   height: '60px', 
                   borderRadius: '15px',
-                  background: `linear-gradient(135deg, ${feature.color}, ${feature.color}dd)`,
+                  background: 'rgba(255,255,255,0.2)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  marginBottom: '1.5rem'
+                  marginBottom: '1.5rem',
+                  boxShadow: '0 4px 15px rgba(0,0,0,0.2)',
+                  border: '2px solid rgba(255,255,255,0.3)'
                 }}>
-                  <feature.icon size={28} color="white" />
+                  <feature.icon size={28} color="#ffffff" />
                 </div>
-                <h3 style={{ fontSize: '1.5rem', fontWeight: 600, marginBottom: '1rem', color: 'var(--text-primary)' }}>{feature.title}</h3>
-                <p style={{ color: 'var(--text-gray)', lineHeight: 1.8 }}>{feature.description}</p>
+                <h3 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1rem', color: 'var(--text-primary)' }}>{feature.title}</h3>
+                <p style={{ color: 'var(--text-primary)', lineHeight: 1.8, fontWeight: 500 }}>{feature.description}</p>
               </div>
             ))}
           </div>

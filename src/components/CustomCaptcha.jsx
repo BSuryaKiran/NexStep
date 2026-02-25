@@ -6,8 +6,8 @@ const CustomCaptcha = ({ onVerify, onClose }) => {
     { question: "What is the default port for React dev?", answer: "3000" },
     { question: "Which symbol is used for IDs in CSS?", answer: "#" },
     { question: "What is the 'M' in MERN stack?", answer: "MongoDB" },
-    { question: "What does CSS stand for?", answer: "Cascading" },
-    { question: "What does API stand for?", answer: "Application" },
+    { question: "What does 'C' in CSS stand for?", answer: "Cascading" },
+    { question: "What does 'A' in API stand for?", answer: "Application" },
     { question: "What tag is used for links in HTML?", answer: "a" },
     { question: "Which JS keyword is used for constants?", answer: "const" }
   ];
